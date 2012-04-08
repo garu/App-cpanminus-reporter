@@ -1,5 +1,15 @@
 App-cpantesters
 
+This is a WORK IN PROGRESS, as in NOT DONE YET.
+
+It's meant to let you use CPAN Testers with cpanm :)
+
+Find us (garu, xdg, barbie, miyagawa) on irc.perl.org if you care and/or
+wish to contribute. Thanks!
+
+
+
+
 These are generic instructions to install the module. Please refer to:
 
    http://beta.metacpan.org/module/MODULE

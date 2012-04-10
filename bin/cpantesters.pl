@@ -7,9 +7,13 @@ use 5.14.0;
 use warnings;
 
 use App::cpantesters;
+use Getopt::Long;
+use Pod::Usage;
 
-# TODO: getopt for cpanm_dir && build_logfile
-my $tester = App::cpantesters->new;
+my %options = ();
+GetOptions( \%options, qw(cpanm_dir=s build_logfile=s) ) or pod2usage();
+
+my $tester = App::cpantesters->new( %options );
 
 $tester->run();
 

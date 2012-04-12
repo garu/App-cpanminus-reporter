@@ -3,7 +3,7 @@
 # DBIx::Class::Manual::SQLHackers
 # TODO - does cpanm work like "cpan ."? This might not have the Fetching/Entering bits
 # TODO - get_config_file => Config::Tiny->read( .cpanreporter/config )
-use 5.14.0;
+use strict;
 use warnings;
 
 use App::cpantesters;

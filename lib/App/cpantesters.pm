@@ -82,6 +82,7 @@ sub run {
        
         if ( $recording and ( /^Result: (PASS|NA|FAIL|UNKNOWN)/ or /^-> (FAIL|OK)/ ) ) {
             my $result = $1;
+            $result = 'PASS' if $result eq 'OK';
             if (@test_output <= 2) {
                 print "No test output found for '$dist'. Skipping...\n"
                     . "To send test reports, please make sure *NOT* to pass '-v' to cpanm or your build.log will contain no output to send.\n";

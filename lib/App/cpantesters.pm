@@ -17,23 +17,23 @@ sub new {
   my ($class, %params) = @_;
   my $self = bless {}, $class;
 
-  $self->cpanm_dir(
-          $params{cpanm_dir}
-       || File::Spec->catdir( File::HomeDir->my_home, '.cpanm' )
+  $self->build_dir(
+          $params{build_dir}
+       || File::Spec->catdir( File::HomeDir->my_home, '.cpanm', 'latest-build' )
   );
 
   $self->build_logfile(
           $params{build_logfile}
-      ||  File::Spec->catfile( $self->cpanm_dir, 'build.log' )
+      ||  File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
   return $self;
 }
 
-sub cpanm_dir {
+sub build_dir {
   my ($self, $dir) = @_;
-  $self->{_cpanm_dir} = $dir if $dir;
-  return $self->{_cpanm_dir};
+  $self->{_build_dir} = $dir if $dir;
+  return $self->{_build_dir};
 }
 
 sub build_logfile {
@@ -140,7 +140,7 @@ sub make_report {
 
 sub get_meta_for {
     my ($self, $dist) = @_;
-    my $distdir = File::Spec->catdir( $self->cpanm_dir, 'latest-build', $dist );
+    my $distdir = File::Spec->catdir( $self->build_dir, $dist );
 
     foreach my $meta_file ( qw( META.json META.yml META.yaml ) ) {
         my $meta_path = File::Spec->catfile( $distdir, $meta_file );

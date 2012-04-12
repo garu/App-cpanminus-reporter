@@ -11,7 +11,7 @@ use Getopt::Long;
 use Pod::Usage;
 
 my %options = ();
-GetOptions( \%options, qw(cpanm_dir=s build_logfile=s) ) or pod2usage();
+GetOptions( \%options, qw(build_dir=s build_logfile=s) ) or pod2usage();
 
 my $tester = App::cpantesters->new( %options );
 
@@ -36,10 +36,10 @@ Basic usage (for now, meaning developers only!!):
 
 OPTIONAL ARGUMENTS
 
-   --cpanm_dir=PATH       Where your cpanminus home is, containing
-                          the 'latest-build' subdir. Default: $HOME/.cpanm
+   --build_dir=PATH       Where your build directory is, containing
+                          each dist's subdir. Default: $HOME/.cpanm/latest-build
 
-   --build_logfile=PATH   Where the build.log is. Default: $CPANM_DIR/build.log
+   --build_logfile=PATH   Where the build.log is. Default: $BUILD_DIR/build.log
 
 
 Then check out STDERR for messages, and /tmp/reporter to see the emails that will be sent to CPAN Testers!

@@ -29,10 +29,22 @@ Basic usage (for now, meaning developers only!!):
 
    > mkdir /tmp/reporter
 
-   > cpanm Some::Module
+   > cpanm Some::Module    # do *NOT* pass -v to cpanm!!
    (wait for it to finish)
 
    > cpantesters
 
+OPTIONAL ARGUMENTS
+
+   --cpanm_dir=PATH       Where your cpanminus home is, containing
+                          the 'latest-build' subdir. Default: $HOME/.cpanm
+
+   --build_logfile=PATH   Where the build.log is. Default: $CPANM_DIR/build.log
+
+
 Then check out STDERR for messages, and /tmp/reporter to see the emails that will be sent to CPAN Testers!
 
+CAVEAT
+
+cpanm currently does not record the output into your build.log file if you pass the "verbose" argument to it,
+either C<--verbose> or C<-v>. If you used those, we won't be able to send any reports :(

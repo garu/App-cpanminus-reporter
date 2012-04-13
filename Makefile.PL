@@ -20,6 +20,8 @@ WriteMakefile(
         'App::cpanminus'                => 0,
         'Getopt::Long'                  => 0,
         'Pod::Usage'                    => 0,
+        'Try::Tiny'                     => 0,
+        'Metabase::Resource'            => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'App-cpantesters-*' },

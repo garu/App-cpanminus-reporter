@@ -12,6 +12,7 @@ use Test::Reporter 1.54;
 use CPAN::Testers::Common::Client;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
+use Try::Tiny;
 use URI;
 use Metabase::Resource;
 
@@ -104,11 +105,17 @@ sub run {
 }
 
 sub get_author {
-  my ($self, $resource) = @_;
-  my $uri = URI->new($resource);
-  my $metadata = Metabase::Resource->new( q[cpan:///distfile/] . $uri->path )->metadata;
+  my ($self, $path ) = @_;
+  my $metadata;
 
+  try {
+    $metadata = Metabase::Resource->new( q[cpan:///distfile/] . $path )->metadata;
+  }
+  catch {
+    print "DEBUG: $_";
+  };
   return unless $metadata;
+
   return $metadata->{cpan_id};
 }
 
@@ -116,8 +123,18 @@ sub get_author {
 sub make_report {
     my ($self, $resource, $dist, $result, @test_output) = @_;
 
-    my $author = $self->get_author( $resource )
-        or Carp::croak "error fetching author for resource '$resource'. Please send us a bug report.";
+    my $uri = URI->new( $resource );
+    my $scheme = lc $uri->scheme;
+    if ($scheme ne 'http' and $scheme ne 'ftp' and $scheme ne 'cpan') {
+        print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n";
+        return;
+    }
+
+    my $author = $self->get_author( $uri->path );
+    unless ($author) {
+        print "error fetching author for resource '$resource'. Skipping...\n";
+        return;
+    }
 
     eval { require App::cpanminus };
     my $cpanm = $@ ? 'unknown cpanm' : "cpanm $App::cpanminus::VERSION";

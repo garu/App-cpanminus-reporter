@@ -12,6 +12,8 @@ use Test::Reporter 1.54;
 use CPAN::Testers::Common::Client;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
+use URI;
+use Metabase::Resource;
 
 sub new {
   my ($class, %params) = @_;
@@ -88,7 +90,6 @@ sub run {
                     . "To send test reports, please make sure *NOT* to pass '-v' to cpanm or your build.log will contain no output to send.\n";
             }
             else {
-                print "sending: ($resource, $dist, $result)\n";
                 my $report = $self->make_report($resource, $dist, $result, @test_output);
             }
             return;
@@ -102,26 +103,33 @@ sub run {
   return;
 }
 
+sub get_author {
+  my ($self, $resource) = @_;
+  my $uri = URI->new($resource);
+  my $metadata = Metabase::Resource->new( q[cpan:///distfile/] . $uri->path )->metadata;
+
+  return unless $metadata;
+  return $metadata->{cpan_id};
+}
+
 
 sub make_report {
     my ($self, $resource, $dist, $result, @test_output) = @_;
 
-    # TODO: this should definitely be stricter
-    if ( $resource =~ m{cpan.+/id/.+/([A-Z]+)/($dist\..+)$} ) {
-        $resource = "cpan:///distfile/$1/$2";
-    }
-    else {
-        Carp::croak "error parsing '$resource' for '$dist'. Please send us a report!";
-    }
+    my $author = $self->get_author( $resource )
+        or Carp::croak "error fetching author for resource '$resource'. Please send us a bug report.";
 
     eval { require App::cpanminus };
     my $cpanm = $@ ? 'unknown cpanm' : "cpanm $App::cpanminus::VERSION";
 
+    print "sending: ($resource, $author, $dist, $result)\n";
+
     my $meta = $self->get_meta_for( $dist );
     my $client = CPAN::Testers::Common::Client->new(
-          resource    => $resource,
-          via         => "App::cpantesters $VERSION ($cpanm)",
+          author      => $author,
+          distname    => $dist,
           grade       => $result,
+          via         => "App::cpantesters $VERSION ($cpanm)",
           test_output => join( '', @test_output ),
           prereqs     => $meta->{prereqs},
     );

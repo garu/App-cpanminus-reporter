@@ -148,7 +148,7 @@ sub get_meta_for {
             my $meta = eval { Parse::CPAN::Meta->load_file( $meta_path ) };
             next if $@;
 
-            if ($meta->{'meta-spec'}{version} < 2) {
+            if (!$meta->{'meta-spec'} or $meta->{'meta-spec'}{version} < 2) {
                 $meta = CPAN::Meta::Converter->new( $meta )->convert( version => 2 );
             }
             return $meta;

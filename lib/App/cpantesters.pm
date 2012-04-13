@@ -131,7 +131,7 @@ sub make_report {
           grade       => $result,
           via         => "App::cpantesters $VERSION ($cpanm)",
           test_output => join( '', @test_output ),
-          prereqs     => $meta->{prereqs},
+          prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
     );
 
     my $reporter = Test::Reporter->new(
@@ -162,7 +162,7 @@ sub get_meta_for {
             return $meta;
         }
     }
-    return undef;
+    return;
 }
 
 #sub send_report {

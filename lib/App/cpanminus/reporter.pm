@@ -275,7 +275,7 @@ __END__
 
 =head1 NAME
 
-App::cpanminus::reporter - [One line description of module's purpose here]
+App::cpanminus::reporter - send cpanm output to CPAN Testers
 
 =head1 SYNOPSIS
 

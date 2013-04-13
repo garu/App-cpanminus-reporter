@@ -64,19 +64,23 @@ sub new {
          . Config::Tiny->errstr() . "\nFalling back to default values\n";
 
       $config = {
-          edit_report => 'default:no pass/na:no',
-          email_from  => getpwuid($<) . '@localhost',
-          send_report => 'default:yes pass/na:yes',
-          transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( _get_config_dir, 'metabase_id.json' ),
+          _ => {
+              edit_report => 'default:no pass/na:no',
+              email_from  => getpwuid($<) . '@localhost',
+              send_report => 'default:yes pass/na:yes',
+              transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( _get_config_dir, 'metabase_id.json' ),
+          },
       };
   }
-  my @transport = split /\s+/ => $config->{transport};
-  my $transport_name = shift @transport;
-  $config->{transport} = {
+  my @transport = split /\s+/ => $config->{_}{transport};
+  my $transport_name = shift @transport
+    or die 'transport method missing.';
+  $config->{_}{transport} = {
       name => $transport_name,
       args => [ @transport ],
   };
-  $self->config( $config );
+  $config->{_}{email_from} = $params{email_from} if exists $params{email_from};
+  $self->config( $config->{_} );
 
   $self->build_dir(
           $params{build_dir}
@@ -86,11 +90,6 @@ sub new {
   $self->build_logfile(
           $params{build_logfile}
       ||  File::Spec->catfile( $self->build_dir, 'build.log' )
-  );
-
-  $self->email_from(
-          $params{email_from}
-      || $config->{email_from}
   );
 
   return $self;
@@ -229,7 +228,7 @@ sub make_report {
         grade          => $client->grade,
         distribution   => $dist,
         distfile       => ($uri->path_segments)[-1],
-        from           => $self->email_from,
+        from           => $self->config->{email_from},
         comments       => $client->email,
         via            => $client->via,
     );

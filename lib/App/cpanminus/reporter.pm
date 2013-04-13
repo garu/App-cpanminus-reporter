@@ -182,7 +182,7 @@ sub run {
 
   print "Parsing $logfile...\n" if $self->verbose;
   $parser->();
-  print "No reports found." unless $found;
+  print "No reports found.\n" unless $found;
   print "Finished.\n" if $self->verbose;
 
   close $fh;
@@ -276,7 +276,6 @@ __END__
 =head1 NAME
 
 App::cpanminus::reporter - [One line description of module's purpose here]
-
 
 =head1 SYNOPSIS
 

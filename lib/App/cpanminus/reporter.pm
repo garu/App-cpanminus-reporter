@@ -15,6 +15,7 @@ use CPAN::Meta::Converter;
 use Try::Tiny;
 use URI;
 use Metabase::Resource;
+use Capture::Tiny qw(capture);
 
 # TODO:
 ## BEGIN: factor these into CPAN::Testers::Common::Client?
@@ -92,6 +93,8 @@ sub new {
       ||  File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
+  $self->verbose( $params{verbose} || 0 );
+
   return $self;
 }
 
@@ -102,6 +105,12 @@ sub config {
     my ($self, $config) = @_;
     $self->{_config} = $config if $config;
     return $self->{_config};
+}
+
+sub verbose {
+    my ($self, $verbose) = @_;
+    $self->{_verbose} = $verbose if $verbose;
+    return $self->{_verbose};
 }
 
 sub build_dir {
@@ -142,13 +151,13 @@ sub run {
             my $dep = $1;
             Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording;
             Carp::croak "Parsing error. Found '$dep' without fetching first." unless $resource;
-            print "entering $dep, $fetched\n";
+            print "entering $dep, $fetched\n" if $self->verbose;
             $parser->($dep, $fetched);
-            print "left $dep, $fetched\n";
+            print "left $dep, $fetched\n" if $self->verbose;
             next;
         }
         elsif ( $dist and /^Building and testing $dist/) {
-            print "recording $dist\n";
+            print "recording $dist\n" if $self->verbose;
             $recording = 1;
         }
 
@@ -167,9 +176,12 @@ sub run {
             return;
         }
     }
+    print "No reports found!\n" unless @test_output;
   };
 
+  print "Parsing $logfile...\n" if $self->verbose;
   $parser->();
+  print "Finished.\n" if $self->verbose;
 
   close $fh;
   return;
@@ -183,7 +195,7 @@ sub get_author {
     $metadata = Metabase::Resource->new( q[cpan:///distfile/] . $path )->metadata;
   }
   catch {
-    print "DEBUG: $_";
+    print "DEBUG: $_" if $self->verbose;
   };
   return unless $metadata;
 
@@ -197,27 +209,28 @@ sub make_report {
     my $uri = URI->new( $resource );
     my $scheme = lc $uri->scheme;
     if ($scheme ne 'http' and $scheme ne 'ftp' and $scheme ne 'cpan') {
-        print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n";
+        print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n" if $self->verbose;
         return;
     }
 
     my $author = $self->get_author( $uri->path );
     unless ($author) {
-        print "error fetching author for resource '$resource'. Skipping...\n";
+        print "error fetching author for resource '$resource'. Skipping...\n" if $self->verbose;
         return;
     }
 
-    eval { require App::cpanminus };
-    my $cpanm = $@ ? 'unknown cpanm' : "cpanm $App::cpanminus::VERSION";
+    my $cpanm_version = capture { system('cpanm -V') };
+    chomp $cpanm_version;
+    $cpanm_version = 'unknown cpanm' unless $cpanm_version =~ /\d+/;
 
-    print "sending: ($resource, $author, $dist, $result)\n";
+    print "sending: ($resource, $author, $dist, $result)\n" if $self->verbose;
 
     my $meta = $self->get_meta_for( $dist );
     my $client = CPAN::Testers::Common::Client->new(
           author      => $author,
           distname    => $dist,
           grade       => $result,
-          via         => "App::cpanminus::reporter $VERSION ($cpanm)",
+          via         => "App::cpanminus::reporter $VERSION ($cpanm_version)",
           test_output => join( '', @test_output ),
           prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
     );

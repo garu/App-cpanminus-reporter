@@ -6,8 +6,8 @@ use strict;
 our $VERSION = '0.01';
 
 use Carp ();
-use File::Spec;
-use File::HomeDir;
+use File::Spec     3.19;
+use File::HomeDir  0.58 ();
 use Test::Reporter 1.54;
 use CPAN::Testers::Common::Client;
 use Parse::CPAN::Meta;
@@ -16,9 +16,67 @@ use Try::Tiny;
 use URI;
 use Metabase::Resource;
 
+# TODO:
+## BEGIN: factor these into CPAN::Testers::Common::Client?
+use Config::Tiny 2.08 ();
+
+## stolen verbatim from CPAN::Reporter::Config
+sub _get_config_dir {
+    if ( defined $ENV{PERL_CPAN_REPORTER_DIR} &&
+         length  $ENV{PERL_CPAN_REPORTER_DIR}
+    ) {
+        return $ENV{PERL_CPAN_REPORTER_DIR};
+    }
+
+    my $conf_dir = File::Spec->catdir(File::HomeDir->my_home, ".cpanreporter");
+
+    if ($^O eq 'MSWin32') {
+      my $alt_dir = File::Spec->catdir(File::HomeDir->my_documents, ".cpanreporter");
+      $conf_dir = $alt_dir if -d $alt_dir && ! -d $conf_dir;
+    }
+
+    return $conf_dir;
+}
+
+## stolen verbatim from CPAN::Reporter::Config
+sub _get_config_file {
+    if (  defined $ENV{PERL_CPAN_REPORTER_CONFIG} &&
+          length  $ENV{PERL_CPAN_REPORTER_CONFIG}
+    ) {
+        return $ENV{PERL_CPAN_REPORTER_CONFIG};
+    }
+    else {
+        return File::Spec->catdir( _get_config_dir, 'config.ini' );
+    }
+}
+## END: factor these into CPAN::Testers::Common::Client?
+
+
 sub new {
   my ($class, %params) = @_;
   my $self = bless {}, $class;
+  my $config_filename = _get_config_file();
+  my $config = Config::Tiny->read( $config_filename );
+  # FIXME: poor man's validation, we should factor this out
+  # from CPAN::Reporter::Config SOON!
+  unless ($config) {
+      warn "Error reading configuration file '$config_filename': "
+         . Config::Tiny->errstr() . "\nFalling back to default values\n";
+
+      $config = {
+          edit_report => 'default:no pass/na:no',
+          email_from  => getpwuid($<) . '@localhost',
+          send_report => 'default:yes pass/na:yes',
+          transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( _get_config_dir, 'metabase_id.json' ),
+      };
+  }
+  my @transport = split /\s+/ => $config->{transport};
+  my $transport_name = shift @transport;
+  $config->{transport} = {
+      name => $transport_name,
+      args => [ @transport ],
+  };
+  $self->config( $config );
 
   $self->build_dir(
           $params{build_dir}
@@ -30,7 +88,21 @@ sub new {
       ||  File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
+  $self->email_from(
+          $params{email_from}
+      || $config->{email_from}
+  );
+
   return $self;
+}
+
+
+## basic accessors ##
+
+sub config {
+    my ($self, $config) = @_;
+    $self->{_config} = $config if $config;
+    return $self->{_config};
 }
 
 sub build_dir {
@@ -152,11 +224,12 @@ sub make_report {
     );
 
     my $reporter = Test::Reporter->new(
-        transport      => 'File',
-        transport_args => [ '/tmp/reporter' ],
+        transport      => $self->config->{transport}{name},
+        transport_args => $self->config->{transport}{args},
         grade          => $client->grade,
         distribution   => $dist,
-        from           => 'whoever@wherever.net (Whoever Wherever)',
+        distfile       => ($uri->path_segments)[-1],
+        from           => $self->email_from,
         comments       => $client->email,
         via            => $client->via,
     );
@@ -181,14 +254,6 @@ sub get_meta_for {
     }
     return;
 }
-
-#sub send_report {
-#    my $tr = Test::Reporter->new;
-#    $tr->grade( $grade );
-#    $tr->distribution( $dist );
-#    $tr->distfile( );
-#    
-#}
 
 
 42;

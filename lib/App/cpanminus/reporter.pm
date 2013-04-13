@@ -221,6 +221,9 @@ sub make_report {
         return;
     }
 
+    ## NOTE: Whenever cpanm is called, it resets build.log
+    ##       This is an interesting side-effect that helps us
+    ##       to refrain from sending duplicate reports.
     my $cpanm_version = capture { system('cpanm -V') };
     chomp $cpanm_version;
     $cpanm_version = 'unknown cpanm' unless $cpanm_version =~ /\d+/;

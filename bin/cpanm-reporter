@@ -36,6 +36,8 @@ cpanm-reporter - send cpanm output to CPAN Testers
 
    --build_logfile=PATH   Where the build.log is. Default: $BUILD_DIR/build.log
 
+   --verbose (or -v)      Extra output
+
 
 =head1 DESCRIPTION
 

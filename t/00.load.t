@@ -1,7 +1,7 @@
 use Test::More tests => 1;
 
 BEGIN {
-use_ok( 'App::cpantesters' );
+use_ok( 'App::cpanminus::reporter' );
 }
 
-diag( "Testing App::cpantesters $App::cpantesters::VERSION" );
+diag( "Testing App::cpanminus::reporter $App::cpanminus::reporter::VERSION" );

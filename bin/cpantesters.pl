@@ -6,14 +6,14 @@
 use strict;
 use warnings;
 
-use App::cpantesters;
+use App::cpanminus::reporter;
 use Getopt::Long;
 use Pod::Usage;
 
 my %options = ();
 GetOptions( \%options, qw(build_dir=s build_logfile=s) ) or pod2usage();
 
-my $tester = App::cpantesters->new( %options );
+my $tester = App::cpanminus::reporter->new( %options );
 
 $tester->run();
 
@@ -32,7 +32,7 @@ Basic usage (for now, meaning developers only!!):
    > cpanm Some::Module    # do *NOT* pass -v to cpanm!!
    (wait for it to finish)
 
-   > cpantesters
+   > cpanm-reporter
 
 OPTIONAL ARGUMENTS
 

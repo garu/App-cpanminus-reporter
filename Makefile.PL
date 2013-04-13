@@ -3,10 +3,10 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'App::cpantesters',
+    NAME                => 'App::cpanminus::reporter',
     AUTHOR              => 'Breno G. de Oliveira <garu@cpan.org>',
-    VERSION_FROM        => 'lib/App/cpantesters.pm',
-    ABSTRACT_FROM       => 'lib/App/cpantesters.pm',
+    VERSION_FROM        => 'lib/App/cpanminus/reporter.pm',
+    ABSTRACT_FROM       => 'lib/App/cpanminus/reporter.pm',
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More'                    => 0,
@@ -24,5 +24,5 @@ WriteMakefile(
         'Metabase::Resource'            => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'App-cpantesters-*' },
+    clean               => { FILES => 'App-cpanminus-reporter-*' },
 );

@@ -1,4 +1,4 @@
-package App::cpantesters;
+package App::cpanminus::reporter;
 
 use warnings;
 use strict;
@@ -146,7 +146,7 @@ sub make_report {
           author      => $author,
           distname    => $dist,
           grade       => $result,
-          via         => "App::cpantesters $VERSION ($cpanm)",
+          via         => "App::cpanminus::reporter $VERSION ($cpanm)",
           test_output => join( '', @test_output ),
           prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
     );
@@ -196,12 +196,12 @@ __END__
 
 =head1 NAME
 
-App::cpantesters - [One line description of module's purpose here]
+App::cpanminus::reporeter - [One line description of module's purpose here]
 
 
 =head1 SYNOPSIS
 
-    use App::cpantesters;
+    use App::cpanminus::reporter;
 
   
 =head1 DESCRIPTION
@@ -236,13 +236,13 @@ App::cpantesters - [One line description of module's purpose here]
     that can be set. These descriptions must also include details of any
     configuration language used.
   
-App::cpantesters requires no configuration files or environment variables.
+App::cpanminus::reporter requires no configuration files or environment variables.
 
 
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests to
-C<bug-app-cpantesters@rt.cpan.org>, or through the web interface at
+C<bug-app-cpanminus-reporter@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
 
 

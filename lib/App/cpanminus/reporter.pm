@@ -133,6 +133,7 @@ sub run {
   open my $fh, '<', $logfile
     or Carp::croak "error opening build log file '$logfile' for reading: $!";
 
+  my $found = 0;
   my $parser;
 
   $parser = sub {
@@ -149,6 +150,7 @@ sub run {
         }
         elsif ( /^Entering (\S+)/ ) {
             my $dep = $1;
+            $found = 1;
             Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording;
             Carp::croak "Parsing error. Found '$dep' without fetching first." unless $resource;
             print "entering $dep, $fetched\n" if $self->verbose;
@@ -176,11 +178,11 @@ sub run {
             return;
         }
     }
-    print "No reports found!\n" unless @test_output;
   };
 
   print "Parsing $logfile...\n" if $self->verbose;
   $parser->();
+  print "No reports found." unless $found;
   print "Finished.\n" if $self->verbose;
 
   close $fh;

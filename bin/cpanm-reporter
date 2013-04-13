@@ -1,3 +1,4 @@
+#!perl
 # TODO - try it with these:
 # illguts
 # DBIx::Class::Manual::SQLHackers

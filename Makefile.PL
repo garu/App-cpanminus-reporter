@@ -10,9 +10,9 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More'                    => 0,
-        'File::Spec'                    => 0,
+        'File::Spec'                    => 3.19,
         'Carp'                          => 0,
-        'File::HomeDir'                 => 0,
+        'File::HomeDir'                 => 0.58,
         'Test::Reporter'                => '1.54',
         'CPAN::Testers::Common::Client' => 0,
         'Parse::CPAN::Meta'             => 0,
@@ -21,7 +21,9 @@ WriteMakefile(
         'Pod::Usage'                    => 0,
         'Try::Tiny'                     => 0,
         'Metabase::Resource'            => 0,
+        'Config::Tiny'                  => 2.08,
     },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'App-cpanminus-reporter-*' },
+    EXE_FILES => [ 'bin/cpanm-reporter' ],
+    dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean     => { FILES => 'App-cpanminus-reporter-*' },
 );

@@ -196,7 +196,7 @@ __END__
 
 =head1 NAME
 
-App::cpanminus::reporeter - [One line description of module's purpose here]
+App::cpanminus::reporter - [One line description of module's purpose here]
 
 
 =head1 SYNOPSIS

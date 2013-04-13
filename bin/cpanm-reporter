@@ -1,7 +1,4 @@
 #!perl
-# TODO - try it with these:
-# illguts
-# DBIx::Class::Manual::SQLHackers
 # TODO - does cpanm work like "cpan ."? This might not have the Fetching/Entering bits
 # TODO - get_config_file => Config::Tiny->read( .cpanreporter/config )
 use strict;
@@ -20,22 +17,19 @@ $tester->run();
 
 __END__
 
-=head1 WARNING: WORK IN PROGRESS AHEAD
+=head1 NAME
 
-This is a work in progress for now. If you care, please look for garu, xdg, barbie or miyagawa on irc.perl.org. Cheers.
+cpanm-reporter - send cpanm output to CPAN Testers
 
 =head1 SYNOPSIS
 
-Basic usage (for now, meaning developers only!!):
+   # call cpanm as you would normally, but WITHOUT '-v'
+   cpanm Moose Catalyst::Runtime Data::Printer
 
-   > mkdir /tmp/reporter
+   # then, just call cpanm-reporter
+   cpanm-reporter
 
-   > cpanm Some::Module    # do *NOT* pass -v to cpanm!!
-   (wait for it to finish)
-
-   > cpanm-reporter
-
-OPTIONAL ARGUMENTS
+=head2 OPTIONAL ARGUMENTS
 
    --build_dir=PATH       Where your build directory is, containing
                           each dist's subdir. Default: $HOME/.cpanm/latest-build
@@ -43,9 +37,19 @@ OPTIONAL ARGUMENTS
    --build_logfile=PATH   Where the build.log is. Default: $BUILD_DIR/build.log
 
 
-Then check out STDERR for messages, and /tmp/reporter to see the emails that will be sent to CPAN Testers!
+=head1 DESCRIPTION
 
-CAVEAT
+This app lets you pass the output of L<cpanm> (C<build.log>) to the
+CPAN Testers database.
+
+
+=head1 CAVEATS
 
 cpanm currently does not record the output into your build.log file if you pass the "verbose" argument to it,
 either C<--verbose> or C<-v>. If you used those, we won't be able to send any reports :(
+
+=head1 AUTHOR
+
+Breno G. de Oliveira  C<< <garu@cpan.org> >>
+
+

@@ -17,7 +17,6 @@ WriteMakefile(
         'CPAN::Testers::Common::Client' => 0,
         'Parse::CPAN::Meta'             => 0,
         'CPAN::Meta::Converter'         => 0,
-        'App::cpanminus'                => 0,
         'Getopt::Long'                  => 0,
         'Pod::Usage'                    => 0,
         'Try::Tiny'                     => 0,

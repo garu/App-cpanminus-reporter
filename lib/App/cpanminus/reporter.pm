@@ -237,12 +237,13 @@ sub make_report {
           prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
     );
 
+    my $dist_file = join '/' => ($uri->path_segments)[-2,-1];
     my $reporter = Test::Reporter->new(
         transport      => $self->config->{transport}{name},
         transport_args => $self->config->{transport}{args},
         grade          => $client->grade,
         distribution   => $dist,
-        distfile       => ($uri->path_segments)[-1],
+        distfile       => $dist_file,
         from           => $self->config->{email_from},
         comments       => $client->email,
         via            => $client->via,

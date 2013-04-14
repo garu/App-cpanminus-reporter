@@ -18,8 +18,7 @@ use URI;
 use Metabase::Resource;
 use Capture::Tiny qw(capture);
 
-# TODO:
-## BEGIN: factor these into CPAN::Testers::Common::Client?
+# TODO: factor these into CPAN::Testers::Common::Client?
 use Config::Tiny 2.08 ();
 
 sub new {
@@ -260,11 +259,10 @@ App::cpanminus::reporter - send cpanm output to CPAN Testers
 =head1 SYNOPSIS
 
 This is just the backend module, you are probably looking for L<cpanm-reporter>'s
-documentation instead.
+documentation instead. Please look there for a much comprehensive documentation.
 
-   > cpanm Some::Module; cpanm-reporter
 
-But, if you're really here for this (seriously? why?) here goes!
+=head1 STILL HERE?
 
     use App::cpanminus::reporter;
     my $tester = App::cpanminus::reporter->new( %options );

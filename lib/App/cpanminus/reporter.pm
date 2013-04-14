@@ -29,6 +29,7 @@ sub new {
   my $config = CPAN::Testers::Common::Client::Config->new;
   my $config_filename = $config->get_config_filename();
   my $config_data = Config::Tiny->read( $config_filename );
+
   # FIXME: poor man's validation, we should factor this out
   # from CPAN::Reporter::Config SOON!
   #FIXME: currently, this only cares for email_from and transport.
@@ -45,15 +46,16 @@ sub new {
       },
     };
   }
-  my @transport = split /\s+/ => $config->{_}{transport};
+
+  my @transport = split /\s+/ => $config_data->{_}{transport};
   my $transport_name = shift @transport
     or die 'transport method missing.';
-  $config->{_}{transport} = {
+  $config_data->{_}{transport} = {
     name => $transport_name,
     args => [ @transport ],
   };
-  $config->{_}{email_from} = $params{email_from} if exists $params{email_from};
-  $self->config( $config->{_} );
+  $config_data->{_}{email_from} = $params{email_from} if exists $params{email_from};
+  $self->config( $config_data->{_} );
 
   $self->build_dir(
     $params{build_dir}

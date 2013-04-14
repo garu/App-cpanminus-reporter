@@ -7,7 +7,8 @@ use Getopt::Long;
 use Pod::Usage;
 
 my %options = ();
-GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v!) ) or pod2usage();
+GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v!) )
+    or pod2usage();
 
 my $tester = App::cpanminus::reporter->new( %options );
 

@@ -22,6 +22,7 @@ WriteMakefile(
         'Try::Tiny'                     => 0,
         'Metabase::Resource'            => 0,
         'Config::Tiny'                  => 2.08,
+        'IO::Prompt::Tiny'              => 0,
     },
     EXE_FILES => [ 'bin/cpanm-reporter' ],
     dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

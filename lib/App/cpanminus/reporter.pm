@@ -10,6 +10,7 @@ use File::Spec     3.19;
 use File::HomeDir  0.58 ();
 use Test::Reporter 1.54;
 use CPAN::Testers::Common::Client;
+use CPAN::Testers::Common::Client::Config;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
 use Try::Tiny;
@@ -21,46 +22,17 @@ use Capture::Tiny qw(capture);
 ## BEGIN: factor these into CPAN::Testers::Common::Client?
 use Config::Tiny 2.08 ();
 
-## stolen verbatim from CPAN::Reporter::Config
-sub _get_config_dir {
-    if ( defined $ENV{PERL_CPAN_REPORTER_DIR} &&
-         length  $ENV{PERL_CPAN_REPORTER_DIR}
-    ) {
-        return $ENV{PERL_CPAN_REPORTER_DIR};
-    }
-
-    my $conf_dir = File::Spec->catdir(File::HomeDir->my_home, ".cpanreporter");
-
-    if ($^O eq 'MSWin32') {
-      my $alt_dir = File::Spec->catdir(File::HomeDir->my_documents, ".cpanreporter");
-      $conf_dir = $alt_dir if -d $alt_dir && ! -d $conf_dir;
-    }
-
-    return $conf_dir;
-}
-
-## stolen verbatim from CPAN::Reporter::Config
-sub _get_config_file {
-    if (  defined $ENV{PERL_CPAN_REPORTER_CONFIG} &&
-          length  $ENV{PERL_CPAN_REPORTER_CONFIG}
-    ) {
-        return $ENV{PERL_CPAN_REPORTER_CONFIG};
-    }
-    else {
-        return File::Spec->catdir( _get_config_dir, 'config.ini' );
-    }
-}
-## END: factor these into CPAN::Testers::Common::Client?
-
-
 sub new {
   my ($class, %params) = @_;
   my $self = bless {}, $class;
-  my $config_filename = _get_config_file();
-  my $config = Config::Tiny->read( $config_filename );
+
+  my $config = CPAN::Testers::Common::Client::Config->new;
+  my $config_filename = $config->get_config_filename();
+  my $config_data = Config::Tiny->read( $config_filename );
   # FIXME: poor man's validation, we should factor this out
   # from CPAN::Reporter::Config SOON!
-  unless ($config) {
+  #FIXME: currently, this only cares for email_from and transport.
+  unless ($config_data) {
       warn "Error reading configuration file '$config_filename': "
          . Config::Tiny->errstr() . "\nFalling back to default values\n";
 
@@ -69,7 +41,7 @@ sub new {
               edit_report => 'default:no pass/na:no',
               email_from  => getpwuid($<) . '@localhost',
               send_report => 'default:yes pass/na:yes',
-              transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( _get_config_dir, 'metabase_id.json' ),
+              transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( $config->get_config_dir, 'metabase_id.json' ),
           },
       };
   }

@@ -50,17 +50,6 @@ it doesn't come with a native way to generate and send test reports to the
 CPAN Testers infrastructure. This standalone app is able to interact with
 your cpanm after you install a module, and do that for you.
 
-=head2 SETUP
-
-Reporting details such as the transport agent and your email are fetched
-from the standard .cpanreporter/config.ini file. If you have ever set up
-test reporting within the 'cpan' shell, you should already have it. Otherwise,
-you can call:
-
-   cpanm-reporter --setup
-
-and answer the questions it shows.
-
 =head2 CONFIGURATION AND ENVIRONMENT
 
 You can use configuration files with different names and locations by setting

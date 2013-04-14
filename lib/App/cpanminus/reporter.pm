@@ -33,36 +33,36 @@ sub new {
   # from CPAN::Reporter::Config SOON!
   #FIXME: currently, this only cares for email_from and transport.
   unless ($config_data) {
-      warn "Error reading configuration file '$config_filename': "
-         . Config::Tiny->errstr() . "\nFalling back to default values\n";
+    warn "Error reading configuration file '$config_filename': "
+      . Config::Tiny->errstr() . "\nFalling back to default values\n";
 
-      $config = {
-          _ => {
-              edit_report => 'default:no pass/na:no',
-              email_from  => getpwuid($<) . '@localhost',
-              send_report => 'default:yes pass/na:yes',
-              transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( $config->get_config_dir, 'metabase_id.json' ),
-          },
-      };
+    $config = {
+      _ => {
+        edit_report => 'default:no pass/na:no',
+        email_from  => getpwuid($<) . '@localhost',
+        send_report => 'default:yes pass/na:yes',
+        transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( $config->get_config_dir, 'metabase_id.json' ),
+      },
+    };
   }
   my @transport = split /\s+/ => $config->{_}{transport};
   my $transport_name = shift @transport
     or die 'transport method missing.';
   $config->{_}{transport} = {
-      name => $transport_name,
-      args => [ @transport ],
+    name => $transport_name,
+    args => [ @transport ],
   };
   $config->{_}{email_from} = $params{email_from} if exists $params{email_from};
   $self->config( $config->{_} );
 
   $self->build_dir(
-          $params{build_dir}
-       || File::Spec->catdir( File::HomeDir->my_home, '.cpanm', 'latest-build' )
+    $params{build_dir}
+      || File::Spec->catdir( File::HomeDir->my_home, '.cpanm', 'latest-build' )
   );
 
   $self->build_logfile(
-          $params{build_logfile}
-      ||  File::Spec->catfile( $self->build_dir, 'build.log' )
+    $params{build_logfile}
+      || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
   $self->verbose( $params{verbose} || 0 );
@@ -74,15 +74,15 @@ sub new {
 ## basic accessors ##
 
 sub config {
-    my ($self, $config) = @_;
-    $self->{_config} = $config if $config;
-    return $self->{_config};
+  my ($self, $config) = @_;
+  $self->{_config} = $config if $config;
+  return $self->{_config};
 }
 
 sub verbose {
-    my ($self, $verbose) = @_;
-    $self->{_verbose} = $verbose if $verbose;
-    return $self->{_verbose};
+  my ($self, $verbose) = @_;
+  $self->{_verbose} = $verbose if $verbose;
+  return $self->{_verbose};
 }
 
 sub build_dir {
@@ -116,39 +116,39 @@ sub run {
     my $fetched;
 
     while (<$fh>) {
-        if ( /^Fetching (\S+)/ ) {
-            $fetched = $1;
-            $resource = $fetched unless $resource;
-        }
-        elsif ( /^Entering (\S+)/ ) {
-            my $dep = $1;
-            $found = 1;
-            Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording;
-            Carp::croak "Parsing error. Found '$dep' without fetching first." unless $resource;
-            print "entering $dep, $fetched\n" if $self->verbose;
-            $parser->($dep, $fetched);
-            print "left $dep, $fetched\n" if $self->verbose;
-            next;
-        }
-        elsif ( $dist and /^Building and testing $dist/) {
-            print "recording $dist\n" if $self->verbose;
-            $recording = 1;
-        }
+      if ( /^Fetching (\S+)/ ) {
+        $fetched = $1;
+        $resource = $fetched unless $resource;
+      }
+      elsif ( /^Entering (\S+)/ ) {
+        my $dep = $1;
+        $found = 1;
+        Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording;
+        Carp::croak "Parsing error. Found '$dep' without fetching first." unless $resource;
+        print "entering $dep, $fetched\n" if $self->verbose;
+        $parser->($dep, $fetched);
+        print "left $dep, $fetched\n" if $self->verbose;
+        next;
+      }
+      elsif ( $dist and /^Building and testing $dist/) {
+        print "recording $dist\n" if $self->verbose;
+        $recording = 1;
+      }
 
-        push @test_output, $_ if $recording;
-       
-        if ( $recording and ( /^Result: (PASS|NA|FAIL|UNKNOWN)/ or /^-> (FAIL|OK)/ ) ) {
-            my $result = $1;
-            $result = 'PASS' if $result eq 'OK';
-            if (@test_output <= 2) {
-                print "No test output found for '$dist'. Skipping...\n"
-                    . "To send test reports, please make sure *NOT* to pass '-v' to cpanm or your build.log will contain no output to send.\n";
-            }
-            else {
-                my $report = $self->make_report($resource, $dist, $result, @test_output);
-            }
-            return;
+      push @test_output, $_ if $recording;
+
+      if ( $recording and ( /^Result: (PASS|NA|FAIL|UNKNOWN)/ or /^-> (FAIL|OK)/ ) ) {
+        my $result = $1;
+        $result = 'PASS' if $result eq 'OK';
+        if (@test_output <= 2) {
+            print "No test output found for '$dist'. Skipping...\n"
+                . "To send test reports, please make sure *NOT* to pass '-v' to cpanm or your build.log will contain no output to send.\n";
         }
+        else {
+            my $report = $self->make_report($resource, $dist, $result, @test_output);
+        }
+        return;
+      }
     }
   };
 
@@ -178,71 +178,73 @@ sub get_author {
 
 
 sub make_report {
-    my ($self, $resource, $dist, $result, @test_output) = @_;
+  my ($self, $resource, $dist, $result, @test_output) = @_;
 
-    my $uri = URI->new( $resource );
-    my $scheme = lc $uri->scheme;
-    if ($scheme ne 'http' and $scheme ne 'ftp' and $scheme ne 'cpan') {
-        print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n" if $self->verbose;
-        return;
-    }
+  my $uri = URI->new( $resource );
+  my $scheme = lc $uri->scheme;
+  if ($scheme ne 'http' and $scheme ne 'ftp' and $scheme ne 'cpan') {
+    print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
+      if $self->verbose;
+    return;
+  }
 
-    my $author = $self->get_author( $uri->path );
-    unless ($author) {
-        print "error fetching author for resource '$resource'. Skipping...\n" if $self->verbose;
-        return;
-    }
+  my $author = $self->get_author( $uri->path );
+  unless ($author) {
+    print "error fetching author for resource '$resource'. Skipping...\n"
+      if $self->verbose;
+    return;
+  }
 
-    ## NOTE: Whenever cpanm is called, it resets build.log
-    ##       This is an interesting side-effect that helps us
-    ##       to refrain from sending duplicate reports.
-    my $cpanm_version = capture { system('cpanm -V') };
-    chomp $cpanm_version;
-    $cpanm_version = 'unknown cpanm' unless $cpanm_version =~ /\d+/;
+  ## NOTE: Whenever cpanm is called, it resets build.log
+  ##       This is an interesting side-effect that helps us
+  ##       to refrain from sending duplicate reports.
+  my $cpanm_version = capture { system('cpanm -V') };
+  chomp $cpanm_version;
+  $cpanm_version = 'unknown cpanm' unless $cpanm_version =~ /\d+/;
 
-    print "sending: ($resource, $author, $dist, $result)\n" if $self->verbose;
+  print "sending: ($resource, $author, $dist, $result)\n" if $self->verbose;
 
-    my $meta = $self->get_meta_for( $dist );
-    my $client = CPAN::Testers::Common::Client->new(
-          author      => $author,
-          distname    => $dist,
-          grade       => $result,
-          via         => "App::cpanminus::reporter $VERSION ($cpanm_version)",
-          test_output => join( '', @test_output ),
-          prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
-    );
+  my $meta = $self->get_meta_for( $dist );
+  my $client = CPAN::Testers::Common::Client->new(
+    author      => $author,
+    distname    => $dist,
+    grade       => $result,
+    via         => "App::cpanminus::reporter $VERSION ($cpanm_version)",
+    test_output => join( '', @test_output ),
+    prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
+  );
 
-    my $dist_file = join '/' => ($uri->path_segments)[-2,-1];
-    my $reporter = Test::Reporter->new(
-        transport      => $self->config->{transport}{name},
-        transport_args => $self->config->{transport}{args},
-        grade          => $client->grade,
-        distribution   => $dist,
-        distfile       => $dist_file,
-        from           => $self->config->{email_from},
-        comments       => $client->email,
-        via            => $client->via,
-    );
-    $reporter->send() || die $reporter->errstr();
+  my $dist_file = join '/' => ($uri->path_segments)[-2,-1];
+  my $reporter = Test::Reporter->new(
+    transport      => $self->config->{transport}{name},
+    transport_args => $self->config->{transport}{args},
+    grade          => $client->grade,
+    distribution   => $dist,
+    distfile       => $dist_file,
+    from           => $self->config->{email_from},
+    comments       => $client->email,
+    via            => $client->via,
+  );
+  $reporter->send() || die $reporter->errstr();
 }
 
 sub get_meta_for {
-    my ($self, $dist) = @_;
-    my $distdir = File::Spec->catdir( $self->build_dir, $dist );
+  my ($self, $dist) = @_;
+  my $distdir = File::Spec->catdir( $self->build_dir, $dist );
 
-    foreach my $meta_file ( qw( META.json META.yml META.yaml ) ) {
-        my $meta_path = File::Spec->catfile( $distdir, $meta_file );
-        if (-e $meta_path) {
-            my $meta = eval { Parse::CPAN::Meta->load_file( $meta_path ) };
-            next if $@;
+  foreach my $meta_file ( qw( META.json META.yml META.yaml ) ) {
+    my $meta_path = File::Spec->catfile( $distdir, $meta_file );
+    if (-e $meta_path) {
+      my $meta = eval { Parse::CPAN::Meta->load_file( $meta_path ) };
+      next if $@;
 
-            if (!$meta->{'meta-spec'} or $meta->{'meta-spec'}{version} < 2) {
-                $meta = CPAN::Meta::Converter->new( $meta )->convert( version => 2 );
-            }
-            return $meta;
-        }
+      if (!$meta->{'meta-spec'} or $meta->{'meta-spec'}{version} < 2) {
+          $meta = CPAN::Meta::Converter->new( $meta )->convert( version => 2 );
+      }
+      return $meta;
     }
-    return;
+  }
+  return;
 }
 
 

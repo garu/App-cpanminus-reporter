@@ -283,42 +283,22 @@ App::cpanminus::reporter - send cpanm output to CPAN Testers
 
 =head1 SYNOPSIS
 
+This is just the backend module, you are probably looking for L<cpanm-reporter>'s
+documentation instead.
+
+   > cpanm Some::Module; cpanm-reporter
+
+But, if you're really here for this (seriously? why?) here goes!
+
     use App::cpanminus::reporter;
+    my $tester = App::cpanminus::reporter->new( %options );
+
+    $tester->run;
 
   
 =head1 DESCRIPTION
 
-
-=head1 INTERFACE 
-
-=for author to fill in:
-    Write a separate section listing the public components of the modules
-    interface. These normally consist of either subroutines that may be
-    exported, or methods that may be called on objects belonging to the
-    classes provided by the module.
-
-
-=head1 DIAGNOSTICS
-
-=over 4
-
-=item C<< Error message here, perhaps with %s placeholders >>
-
-[Description of error here]
-
-=back
-
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=for author to fill in:
-    A full explanation of any configuration system(s) used by the
-    module, including the names and locations of any configuration
-    files, and the meaning of any environment variables or properties
-    that can be set. These descriptions must also include details of any
-    configuration language used.
-  
-App::cpanminus::reporter requires no configuration files or environment variables.
+See L<cpanm-reporter>.
 
 
 =head1 BUGS AND LIMITATIONS

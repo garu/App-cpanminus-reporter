@@ -78,11 +78,12 @@ As a standalone tool, it is important that you run cpanm-reporter
 as soon as you finish cpanm, otherwise your system data may have
 changed, from new libraries to a completely different perl binary.
 
-Because of that, this app will NOT parse build.log files last modified
+Because of that, this app will *NOT* parse build.log files last modified
 longer than 30 minutes before the moment it runs.
 
-You can override this behaviour by passing a --force flag to
-cpanm-reporter, but please take good care to avoid sending bogus reports.
+You can override this behaviour by touching the file or passing
+a --force flag to cpanm-reporter, but please take good care to avoid
+sending bogus reports.
 EOMESSAGE
   }
 

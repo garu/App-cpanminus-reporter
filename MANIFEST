@@ -1,9 +1,11 @@
+bin/cpanm-reporter
 Changes
+ignore.txt
 lib/App/cpanminus/reporter.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 t/00.load.t
-t/perlcritic.t
-t/pod-coverage.t
-t/pod.t
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t

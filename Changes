@@ -1,5 +1,8 @@
 Revision history for App-cpanminus-reporter
 
+0.02  2013-04-15
+      Better placement of TOCTOU caveat warning
+
 0.01  2013-04-15
       Initial release.
 

@@ -50,6 +50,7 @@ it doesn't come with a native way to generate and send test reports to the
 CPAN Testers infrastructure. This standalone app is able to interact with
 your cpanm after you install a module, and do that for you.
 
+
 =head2 CONFIGURATION AND ENVIRONMENT
 
 You can use configuration files with different names and locations by setting
@@ -73,6 +74,17 @@ path and name, you can set this variable to point at the new 'config.ini' file.
 =head1 CAVEATS
 
 =over 4
+
+=item * This is a standalone tool that reads cpanm's C<build.log> file,
+meaning it can potentially be run any time after cpanm has done its thing.
+As such, you must be cautious to only run this tool I<right after> you run
+cpanm, otherwise your whole environment may have changed, rendering the
+report useless - maybe even turning it into a disservice.
+
+B<< As such, we will *only* parse build.log files last modified up to 30
+minutes before. >> You can override this by passing the C<--force> flag
+to cpanm-reporter, but please take good care to avoid sending bogus reports.
+
 
 =item * cpanm currently does B<not> record the output into your build.log file
 if you pass the "verbose" argument to it, either C<--verbose> or C<-v>. If

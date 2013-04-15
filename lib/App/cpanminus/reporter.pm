@@ -66,6 +66,26 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
+  # as a safety mechanism, we only let people parse build.log files
+  # if they were generated up to 30 minutes (1800 seconds) ago,
+  # unless the user asks us to --force it.
+  my $st = lstat $self->build_logfile;
+  if ( !$params{force} && time - $st->mtime > 1800 ) {
+      die <<'EOMESSAGE';
+Fatal: build.log was created longer than 30 minutes ago.
+
+As a standalone tool, it is important that you run cpanm-reporter
+as soon as you finish cpanm, otherwise your system data may have
+changed, from new libraries to a completely different perl binary.
+
+Because of that, this app will NOT parse build.log files last modified
+longer than 30 minutes before the moment it runs.
+
+You can override this behaviour by passing a --force flag to
+cpanm-reporter, but please take good care to avoid sending bogus reports.
+EOMESSAGE
+  }
+
   $self->verbose( $params{verbose} || 0 );
 
   return $self;
@@ -276,6 +296,18 @@ See L<cpanm-reporter>.
 
 
 =head1 BUGS AND LIMITATIONS
+
+=head2 Time of Check x Time of Use
+
+This is a standalone tool that reads cpanm's C<build.log> file, meaning
+it can potentially be run any time after cpanm has done its thing. As such,
+you must be cautious to only run this tool I<right after> you run cpanm,
+otherwise your whole environment may have changed, rendering the report
+useless - maybe even turning it into a disservice.
+
+B<< As such, we will *only* parse build.log files last modified up to 30
+minutes before. >> You can override this by passing the C<--force> flag
+to cpanm-reporter, but please take good care to avoid sending bogus reports.
 
 Please report any bugs or feature requests to
 C<bug-app-cpanminus-reporter@rt.cpan.org>, or through the web interface at

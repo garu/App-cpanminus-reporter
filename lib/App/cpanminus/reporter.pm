@@ -26,6 +26,8 @@ sub new {
   my ($class, %params) = @_;
   my $self = bless {}, $class;
 
+  $self->quiet( $params{quiet} );
+
   my $config = CPAN::Testers::Common::Client::Config->new;
   my $config_filename = $config->get_config_filename();
   my $config_data = Config::Tiny->read( $config_filename );
@@ -35,7 +37,8 @@ sub new {
   #FIXME: currently, this only cares for email_from and transport.
   unless ($config_data) {
     warn "Error reading configuration file '$config_filename': "
-      . Config::Tiny->errstr() . "\nFalling back to default values\n";
+      . Config::Tiny->errstr() . "\nFalling back to default values\n"
+          unless $self->quiet;
 
     $config = {
       _ => {
@@ -108,6 +111,16 @@ sub verbose {
   return $self->{_verbose};
 }
 
+sub quiet {
+  my ($self, $quiet) = @_;
+  if ($quiet) {
+    $self->verbose(0);
+    $self->{_quiet} = 1;
+  }
+  return $self->{_quiet};
+}
+
+
 sub build_dir {
   my ($self, $dir) = @_;
   $self->{_build_dir} = $dir if $dir;
@@ -175,10 +188,10 @@ sub run {
     }
   };
 
-  print "Parsing $logfile...\n" if $self->verbose;
+  print "Parsing $logfile...\n" unless $self->quiet;
   $parser->();
-  print "No reports found.\n" unless $found;
-  print "Finished.\n" if $self->verbose;
+  print "No reports found.\n" unless $found and !$self->quiet;
+  print "Finished.\n" unless $self->quiet;
 
   close $fh;
   return;
@@ -205,16 +218,20 @@ sub make_report {
 
   my $uri = URI->new( $resource );
   my $scheme = lc $uri->scheme;
-  if ($scheme ne 'http' and $scheme ne 'ftp' and $scheme ne 'cpan' and $scheme ne 'file') {
+  if (    $scheme ne 'http'
+      and $scheme ne 'ftp'
+      and $scheme ne 'cpan'
+      and $scheme ne 'file'
+  ) {
     print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
-      if $self->verbose;
+      unless $self->quiet;
     return;
   }
 
   my $author = $self->get_author( $uri->path );
   unless ($author) {
     print "error fetching author for resource '$resource'. Skipping...\n"
-      if $self->verbose;
+      unless $self->quiet;
     return;
   }
 
@@ -225,7 +242,7 @@ sub make_report {
   chomp $cpanm_version;
   $cpanm_version = 'unknown cpanm' unless $cpanm_version =~ /\d+/;
 
-  print "sending: ($resource, $author, $dist, $result)\n" if $self->verbose;
+  print "sending: ($resource, $author, $dist, $result)\n" unless $self->quiet;
 
   my $meta = $self->get_meta_for( $dist );
   my $client = CPAN::Testers::Common::Client->new(

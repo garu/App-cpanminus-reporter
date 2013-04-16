@@ -7,7 +7,7 @@ use Getopt::Long;
 use Pod::Usage;
 
 my %options = ();
-GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v --force) )
+GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q) )
     or pod2usage();
 
 my $tester = App::cpanminus::reporter->new( %options );
@@ -38,6 +38,8 @@ then, just call cpanm-reporter:
    --build_logfile=PATH   Where the build.log is. Default: $BUILD_DIR/build.log
 
    --verbose (or -v)      Extra output
+
+   --quiet (or -q)        As little output as possible (voids -v)
 
 
 =head1 DESCRIPTION

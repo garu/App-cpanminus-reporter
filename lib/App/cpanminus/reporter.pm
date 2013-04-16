@@ -16,6 +16,7 @@ use CPAN::Meta::Converter;
 use Try::Tiny;
 use URI;
 use Metabase::Resource;
+use File::stat;
 use Capture::Tiny qw(capture);
 
 # TODO: factor these into CPAN::Testers::Common::Client?

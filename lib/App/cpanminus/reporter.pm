@@ -205,7 +205,7 @@ sub make_report {
 
   my $uri = URI->new( $resource );
   my $scheme = lc $uri->scheme;
-  if ($scheme ne 'http' and $scheme ne 'ftp' and $scheme ne 'cpan') {
+  if ($scheme ne 'http' and $scheme ne 'ftp' and $scheme ne 'cpan' and $scheme ne 'file') {
     print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
       if $self->verbose;
     return;

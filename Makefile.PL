@@ -9,6 +9,7 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/App/cpanminus/reporter.pm',
     PL_FILES            => {},
     PREREQ_PM => {
+        'Capture::Tiny'                 => 0,
         'CPAN::Meta::Converter'         => 0,
         'CPAN::Testers::Common::Client' => 0.02,
         'Carp'                          => 0,
@@ -24,6 +25,7 @@ WriteMakefile(
         'Test::More'                    => 0,
         'Test::Reporter'                => '1.54',
         'Try::Tiny'                     => 0,
+        'URI'                           => 0,
     },
     EXE_FILES => [ 'bin/cpanm-reporter' ],
     dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

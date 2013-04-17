@@ -9,9 +9,9 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/App/cpanminus/reporter.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Capture::Tiny'                 => 0,
         'CPAN::Meta::Converter'         => 0,
         'CPAN::Testers::Common::Client' => 0.02,
+        'Capture::Tiny'                 => 0,
         'Carp'                          => 0,
         'Config::Tiny'                  => 2.08,
         'File::HomeDir'                 => 0.58,

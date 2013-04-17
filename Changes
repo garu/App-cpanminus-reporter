@@ -1,5 +1,8 @@
 Revision history for App-cpanminus-reporter
 
+0.04  2013-04-17
+      - version requirement for CPAN::Testers::Common::Client
+
 0.03  2013-04-16
       - App is now a bit more verbose, but has a --quiet option
       - Added missing dep (File::stat)

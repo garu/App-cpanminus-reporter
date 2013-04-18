@@ -45,7 +45,7 @@ sub new {
         edit_report => 'default:no pass/na:no',
         email_from  => getpwuid($<) . '@localhost',
         send_report => 'default:yes pass/na:yes',
-        transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ' . File::Spec->catdir( $config->get_config_dir, 'metabase_id.json' ),
+        transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file metabase_id.json' ),
       },
     };
   }
@@ -53,10 +53,24 @@ sub new {
   my @transport = split /\s+/ => $config_data->{_}{transport};
   my $transport_name = shift @transport
     or die 'transport method missing.';
+
+  # unlike other transports, Metabase uses its args as a hash
+  # and forces us to normalize the given id_file.
+  if ($transport_name eq 'Metabase') {
+    my %transport_args = @transport;
+    $transport_args{id_file} = $config->normalize_id_file( $transport_args{id_file} );
+    @transport = %transport_args;
+
+    if ( ! -r $transport_args{id_file} ) {
+      die "Error loading Metabase transport 'id_file' file at '$transport_args{id_file}'\n";
+    }
+  }
+
   $config_data->{_}{transport} = {
     name => $transport_name,
     args => [ @transport ],
   };
+
   $config_data->{_}{email_from} = $params{email_from} if exists $params{email_from};
   $self->config( $config_data->{_} );
 

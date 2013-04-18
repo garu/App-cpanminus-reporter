@@ -1,5 +1,10 @@
 Revision history for App-cpanminus-reporter
 
+0.06  2013-04-18
+      - fixed issue where cpanm-reporter sometimes failed to
+        find the user's metabase_id.json file (thanks aero
+        and wizonesolutions for reporting)
+
 0.05  2013-04-17
       - Added missing deps
 

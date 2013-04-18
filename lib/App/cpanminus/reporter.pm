@@ -3,7 +3,7 @@ package App::cpanminus::reporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp ();
 use File::Spec     3.19;

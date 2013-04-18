@@ -45,7 +45,7 @@ sub new {
         edit_report => 'default:no pass/na:no',
         email_from  => getpwuid($<) . '@localhost',
         send_report => 'default:yes pass/na:yes',
-        transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file metabase_id.json' ),
+        transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file metabase_id.json',
       },
     };
   }

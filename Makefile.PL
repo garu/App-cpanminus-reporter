@@ -10,7 +10,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'CPAN::Meta::Converter'         => 0,
-        'CPAN::Testers::Common::Client' => 0.02,
+        'CPAN::Testers::Common::Client' => 0.03,
         'Capture::Tiny'                 => 0,
         'Carp'                          => 0,
         'Config::Tiny'                  => 2.08,

@@ -7,6 +7,7 @@ WriteMakefile(
     AUTHOR              => 'Breno G. de Oliveira <garu@cpan.org>',
     VERSION_FROM        => 'lib/App/cpanminus/reporter.pm',
     ABSTRACT_FROM       => 'lib/App/cpanminus/reporter.pm',
+    LICENSE             => 'perl',
     PL_FILES            => {},
     PREREQ_PM => {
         'CPAN::Meta::Converter'         => 0,
@@ -27,6 +28,16 @@ WriteMakefile(
         'Try::Tiny'                     => 0,
         'URI'                           => 0,
     },
+    META_MERGE => {
+        recommends => {
+            'LWP::Protocol::https'                => 0,
+            'Test::Reporter::Transport::Metabase' => 0,
+        },
+        resources => {
+            repository => 'http://github.com/garu/App-cpanminus-reporter',
+        },
+    },
+
     EXE_FILES => [ 'bin/cpanm-reporter' ],
     dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean     => { FILES => 'App-cpanminus-reporter-*' },

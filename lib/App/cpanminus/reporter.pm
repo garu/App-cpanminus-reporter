@@ -9,7 +9,7 @@ use Carp ();
 use File::Spec     3.19;
 use File::HomeDir  0.58 ();
 use Test::Reporter 1.54;
-use CPAN::Testers::Common::Client;
+use CPAN::Testers::Common::Client 0.04;
 use CPAN::Testers::Common::Client::Config;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
@@ -18,9 +18,7 @@ use URI;
 use Metabase::Resource;
 use File::stat;
 use Capture::Tiny qw(capture);
-
-# TODO: factor these into CPAN::Testers::Common::Client?
-use Config::Tiny 2.08 ();
+use IO::Prompt::Tiny ();
 
 sub new {
   my ($class, %params) = @_;
@@ -28,51 +26,34 @@ sub new {
 
   $self->quiet( $params{quiet} );
 
-  my $config = CPAN::Testers::Common::Client::Config->new;
-  my $config_filename = $config->get_config_filename();
-  my $config_data = Config::Tiny->read( $config_filename );
-
-  # FIXME: poor man's validation, we should factor this out
-  # from CPAN::Reporter::Config SOON!
-  #FIXME: currently, this only cares for email_from and transport.
-  unless ($config_data) {
-    warn "Error reading configuration file '$config_filename': "
-      . Config::Tiny->errstr() . "\nFalling back to default values\n"
-          unless $self->quiet;
-
-    $config = {
-      _ => {
-        edit_report => 'default:no pass/na:no',
-        email_from  => getpwuid($<) . '@localhost',
-        send_report => 'default:yes pass/na:yes',
-        transport   => 'Metabase uri https://metabase.cpantesters.org/api/v1/ id_file metabase_id.json',
-      },
-    };
+  my $config = CPAN::Testers::Common::Client::Config->new(
+    prompt => \&IO::Prompt::Tiny::prompt,
+  );
+  if ($params{setup}) {
+    $config->setup;
+    return;
   }
 
-  my @transport = split /\s+/ => $config_data->{_}{transport};
-  my $transport_name = shift @transport
-    or die 'transport method missing.';
+  my $config_filename = $config->get_config_filename;
+  if ( -e $config_filename ) {
+    if ( !$config->read ) {
+      print "Error reading CPAN Testers configuration file '$config_filename'. Aborting.";
+      return;
+    }
+  }
+  else {
+    my $answer = IO::Prompt::Tiny::prompt("CPAN Testers configuration file '$config_filename' not found. Would you like to set it up now? (y/n)", 'y');
 
-  # unlike other transports, Metabase uses its args as a hash
-  # and forces us to normalize the given id_file.
-  if ($transport_name eq 'Metabase') {
-    my %transport_args = @transport;
-    $transport_args{id_file} = $config->normalize_id_file( $transport_args{id_file} );
-    @transport = %transport_args;
-
-    if ( ! -r $transport_args{id_file} ) {
-      die "Error loading Metabase transport 'id_file' file at '$transport_args{id_file}'\n";
+    if ( $answer =~ /^y/i ) {
+      $config->setup;
+    }
+    else {
+      print "The CPAN Testers configuration file is required. Aborting.\n";
+      return;
     }
   }
 
-  $config_data->{_}{transport} = {
-    name => $transport_name,
-    args => [ @transport ],
-  };
-
-  $config_data->{_}{email_from} = $params{email_from} if exists $params{email_from};
-  $self->config( $config_data->{_} );
+  $self->config( $config );
 
   $self->build_dir(
     $params{build_dir}
@@ -109,7 +90,6 @@ EOMESSAGE
 
   return $self;
 }
-
 
 ## basic accessors ##
 
@@ -269,12 +249,12 @@ sub make_report {
 
   my $dist_file = join '/' => ($uri->path_segments)[-2,-1];
   my $reporter = Test::Reporter->new(
-    transport      => $self->config->{transport}{name},
-    transport_args => $self->config->{transport}{args},
+    transport      => $self->config->transport_name,
+    transport_args => $self->config->transport_args,
     grade          => $client->grade,
     distribution   => $dist,
     distfile       => $dist_file,
-    from           => $self->config->{email_from},
+    from           => $self->config->email_from,
     comments       => $client->email,
     via            => $client->via,
   );

@@ -7,12 +7,19 @@ use Getopt::Long;
 use Pod::Usage;
 
 my %options = ();
-GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q) )
-    or pod2usage();
+GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q
+                          setup version help)
+) or pod2usage();
+
+pod2usage if $options{help};
+
+if ($options{version}) {
+  print $App::cpanminus::reporter::VERSION . $/;
+  exit;
+}
 
 my $tester = App::cpanminus::reporter->new( %options );
-
-$tester->run();
+$tester->run() if $tester;
 
 __END__
 
@@ -32,6 +39,10 @@ then, just call cpanm-reporter:
 
 =head2 OPTIONAL ARGUMENTS
 
+   --version              Shows version number and exits
+
+   --help                 Shows basic usage help and exists
+
    --build_dir=PATH       Where your build directory is, containing
                           each dist's subdir. Default: $HOME/.cpanm/latest-build
 
@@ -40,6 +51,8 @@ then, just call cpanm-reporter:
    --verbose (or -v)      Extra output
 
    --quiet (or -q)        As little output as possible (voids -v)
+
+   --setup                Sets up the CPAN Testers configuration for you
 
 
 =head1 DESCRIPTION

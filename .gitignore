@@ -1,4 +1,6 @@
 blib*
+*.swp
+*.bak
 Makefile
 Makefile.old
 Build

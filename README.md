@@ -28,6 +28,8 @@ Optional Arguments
 
     --quiet (or -q)        As little output as possible (voids -v)
 
+    --setup                Sets up the CPAN Testers configuration for you
+
 
 For more information, please refer to the full documentation at:
 

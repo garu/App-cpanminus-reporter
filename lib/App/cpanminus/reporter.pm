@@ -135,6 +135,12 @@ sub run {
   open my $fh, '<', $logfile
     or Carp::croak "error opening build log file '$logfile' for reading: $!";
 
+  my $header = <$fh>;
+  if ($header =~ /^cpanm \(App::cpanminus\) (\d+\.\d+) on perl (\d+\.\d+)/) {
+    $self->{_cpanminus_version} = $1;
+    $self->{_perl_version} = $2;
+  }
+
   my $found = 0;
   my $parser;
 
@@ -228,15 +234,9 @@ sub make_report {
     return;
   }
 
-  ## NOTE: Whenever cpanm is called, it resets build.log
-  ##       This is an interesting side-effect that helps us
-  ##       to refrain from sending duplicate reports.
-  my $cpanm_version = capture { system('cpanm -V') };
-  chomp $cpanm_version;
-  $cpanm_version = 'unknown cpanm' unless $cpanm_version =~ /\d+/;
-
   print "sending: ($resource, $author, $dist, $result)\n" unless $self->quiet;
 
+  my $cpanm_version = $self->{_cpanminus_version} || 'unknown cpanm version';
   my $meta = $self->get_meta_for( $dist );
   my $client = CPAN::Testers::Common::Client->new(
     author      => $author,

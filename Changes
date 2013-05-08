@@ -1,5 +1,24 @@
 Revision history for App-cpanminus-reporter
 
+0.07  2013-05-08
+    NEW FEATURES:
+      - new '--setup' option that configures and updates your CPAN Testers
+        data for you, just like CPAN::Reporter does for 'cpan'!
+        (this fixes RT#84799 and Github#2, thanks Maurice Mengel and Boris
+         Däppen for reporting!)
+
+    BUG FIXES:
+      - fixed RT#84979 where cpanm-reporter crashed when the build.log file
+        could not be found (thanks Nathan Glenn for reporting!)
+      - recommends installing Test::Reporter::Transport::Metabase as well,
+        since almost all testers want to report directly to the CPAN Testers
+        servers. Fixes RT#84794 (thanks Mark Lawrence for reporting!)
+      - forces dependency on version 0.05 of CPAN::Testers::Common::Client,
+        which fixes RT#85112 (thanks Lars for reporting!)
+
+    OTHER:
+      - updated docs :)
+
 0.06  2013-04-18
       - fixed issue where cpanm-reporter sometimes failed to
         find the user's metabase_id.json file (thanks aero

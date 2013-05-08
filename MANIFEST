@@ -1,6 +1,5 @@
 bin/cpanm-reporter
 Changes
-ignore.txt
 lib/App/cpanminus/reporter.pm
 Makefile.PL
 MANIFEST			This list of files

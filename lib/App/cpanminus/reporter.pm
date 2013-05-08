@@ -16,7 +16,6 @@ use CPAN::Meta::Converter;
 use Try::Tiny;
 use URI;
 use Metabase::Resource;
-use File::stat;
 use Capture::Tiny qw(capture);
 use IO::Prompt::Tiny ();
 
@@ -68,8 +67,8 @@ sub new {
   # as a safety mechanism, we only let people parse build.log files
   # if they were generated up to 30 minutes (1800 seconds) ago,
   # unless the user asks us to --force it.
-  my $st = lstat $self->build_logfile;
-  if ( !$params{force} && time - $st->mtime > 1800 ) {
+  my $mtime = (stat $self->build_logfile)[9];
+  if ( !$params{force} && $mtime && time - $mtime > 1800 ) {
       die <<'EOMESSAGE';
 Fatal: build.log was created longer than 30 minutes ago.
 

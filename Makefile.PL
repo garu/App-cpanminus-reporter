@@ -17,7 +17,6 @@ WriteMakefile(
         'Config::Tiny'                  => 2.08,
         'File::HomeDir'                 => 0.58,
         'File::Spec'                    => 3.19,
-        'File::stat'                    => 0,
         'Getopt::Long'                  => 0,
         'IO::Prompt::Tiny'              => 0,
         'Metabase::Resource'            => 0,

@@ -41,7 +41,7 @@ then, just call cpanm-reporter:
 
    --version              Shows version number and exits
 
-   --help                 Shows basic usage help and exists
+   --help                 Shows basic usage help and exits
 
    --build_dir=PATH       Where your build directory is, containing
                           each dist's subdir. Default: $HOME/.cpanm/latest-build

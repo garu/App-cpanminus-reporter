@@ -1,5 +1,9 @@
 Revision history for App-cpanminus-reporter
 
+0.08  2013-05-09
+    BUG FIXES:
+      - forced CTCC 0.06 to avoid Metabase id_file issues
+
 0.07  2013-05-08
     NEW FEATURES:
       - new '--setup' option that configures and updates your CPAN Testers

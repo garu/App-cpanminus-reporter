@@ -26,12 +26,13 @@ WriteMakefile(
         'Test::Reporter'                => '1.54',
         'Try::Tiny'                     => 0,
         'URI'                           => 0,
+
+        # this should probably be under 'recommends',
+        # but cpanm doesn't appear to handle recommendations
+        'LWP::Protocol::https'                => 0,
+        'Test::Reporter::Transport::Metabase' => 0,
     },
     META_MERGE => {
-        recommends => {
-            'LWP::Protocol::https'                => 0,
-            'Test::Reporter::Transport::Metabase' => 0,
-        },
         resources => {
             repository => 'http://github.com/garu/App-cpanminus-reporter',
         },

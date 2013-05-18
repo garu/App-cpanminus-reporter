@@ -26,7 +26,7 @@ sub new {
   $self->quiet( $params{quiet} );
 
   my $config = CPAN::Testers::Common::Client::Config->new(
-    prompt => \&IO::Prompt::Tiny::prompt,
+    prompt => sub { local %ENV; IO::Prompt::Tiny::prompt(@_) },
   );
   if ($params{setup}) {
     $config->setup;

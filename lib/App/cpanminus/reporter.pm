@@ -290,7 +290,7 @@ App::cpanminus::reporter - send cpanm output to CPAN Testers
 =head1 SYNOPSIS
 
 This is just the backend module, you are probably looking for L<cpanm-reporter>'s
-documentation instead. Please look there for a much comprehensive documentation.
+documentation instead. Please look there for a B<much more> comprehensive documentation.
 
 
 =head1 STILL HERE?

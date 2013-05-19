@@ -1,5 +1,19 @@
 Revision history for App-cpanminus-reporter
 
+0.09  2013-05-18
+    BUG FIXES:
+      - prevents prompt from being affected by PERL_MM_USE_DEFAULT
+        (thanks Marcel "hanekomu" Grünauer for reporting!)
+
+    OTHER:
+      - Metabase transport now marked as a dependency (previously it was
+        only a recommendation). Some clients do not trust recommendations
+        and the vast majority of cpanm-reporter users are probably
+        sending stuff via Metabase anyway, so I rather "punish" the
+        minority with an extra dependency than the majority with a runtime
+        error :)
+      - improved docs
+
 0.08  2013-05-09
     BUG FIXES:
       - forced CTCC 0.06 to avoid Metabase id_file issues

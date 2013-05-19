@@ -27,7 +27,15 @@ __END__
 
 cpanm-reporter - send cpanm output to CPAN Testers
 
-=head1 SYNOPSIS
+=head1 SETUP
+
+New to CPAN Testers' reporting? No problem! Just run:
+
+   > cpanm-reporter --setup
+
+And we will walk you through everything you need :)
+
+=head1 USAGE
 
 Call cpanm as you normally would:
 

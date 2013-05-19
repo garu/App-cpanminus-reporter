@@ -4,6 +4,16 @@ App-cpanminus-reporter
 This distribution creates a tiny app called `cpanm-reporter` that lets
 you send cpanm output to CPAN Testers.
 
+Setup
+-----
+
+New to CPAN Testers' reporting? No problem! Just run:
+
+   > cpanm-reporter --setup
+
+And we will walk you through everything you need :)
+
+
 Usage
 -----
 

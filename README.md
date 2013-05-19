@@ -9,7 +9,7 @@ Setup
 
 New to CPAN Testers' reporting? No problem! Just run:
 
-   > cpanm-reporter --setup
+    > cpanm-reporter --setup
 
 And we will walk you through everything you need :)
 

@@ -35,6 +35,8 @@ New to CPAN Testers' reporting? No problem! Just run:
 
 And we will walk you through everything you need :)
 
+(if you already use L<CPAN::Reporter>, you can safely skip the setup)
+
 =head1 USAGE
 
 Call cpanm as you normally would:

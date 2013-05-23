@@ -13,6 +13,7 @@ New to CPAN Testers' reporting? No problem! Just run:
 
 And we will walk you through everything you need :)
 
+(if you already use CPAN::Reporter, you can safely skip the setup)
 
 Usage
 -----

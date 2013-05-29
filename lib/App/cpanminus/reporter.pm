@@ -152,6 +152,7 @@ sub run {
 
     while (<$fh>) {
       if ( /^Fetching (\S+)/ ) {
+        next if /CHECKSUMS$/;
         $fetched = $1;
         $resource = $fetched unless $resource;
       }

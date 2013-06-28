@@ -258,7 +258,15 @@ sub make_report {
     comments       => $client->email,
     via            => $client->via,
   );
-  $reporter->send() || die $reporter->errstr();
+
+  try {
+    $reporter->send() || die $reporter->errstr();
+  }
+  catch {
+    print "Error while sending this report, continuing with the next one...\n" unless $self->quiet;
+    print "DEBUG: @_" if $self->verbose;
+  }
+
 }
 
 sub get_meta_for {

@@ -64,6 +64,10 @@ then, just call cpanm-reporter:
 
    --setup                Sets up the CPAN Testers configuration for you
 
+   --only=A::B,C::D,...   Only send reports for these modules
+
+   --exclude=A::B,...     Not send reports for these modules
+
 
 =head1 DESCRIPTION
 

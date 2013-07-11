@@ -265,8 +265,8 @@ sub make_report {
   catch {
     print "Error while sending this report, continuing with the next one...\n" unless $self->quiet;
     print "DEBUG: @_" if $self->verbose;
-  }
-
+  };
+  return;
 }
 
 sub get_meta_for {

@@ -8,7 +8,7 @@ use Pod::Usage;
 
 my %options = ();
 GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q
-                          setup version help)
+                          setup version help exclude=s only=s)
 ) or pod2usage();
 
 pod2usage if $options{help};
@@ -63,6 +63,10 @@ then, just call cpanm-reporter:
    --quiet (or -q)        As little output as possible (voids -v)
 
    --setup                Sets up the CPAN Testers configuration for you
+
+   --only=A::B,C::D,...   Only send reports for these modules
+
+   --exclude=A::B,...     Not send reports for these modules
 
 
 =head1 DESCRIPTION

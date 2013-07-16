@@ -239,10 +239,10 @@ sub run {
     }
   };
 
-  print "Parsing $logfile...\n" unless $self->quiet;
+  print "Parsing $logfile...\n" if $self->verbose;
   $parser->();
-  print "No reports found.\n" unless $found and !$self->quiet;
-  print "Finished.\n" unless $self->quiet;
+  print "No reports found.\n" if !$found and $self->verbose;
+  print "Finished.\n" if $self->verbose;
 
   close $fh;
   return;

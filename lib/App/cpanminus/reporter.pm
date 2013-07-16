@@ -87,6 +87,9 @@ EOMESSAGE
 
   $self->verbose( $params{verbose} || 0 );
 
+  $self->exclude( $params{exclude} );
+  $self->only( $params{only} );
+
   return $self;
 }
 
@@ -113,6 +116,29 @@ sub quiet {
   return $self->{_quiet};
 }
 
+sub only {
+  my ($self, $only) = @_;
+  if ($only) {
+    $only =~ s/::/-/g;
+    my @modules = split q{,}, $only;
+    foreach (@modules) { $_ =~ s/(\S+)-[\d.]+$/$1/ };
+
+    $self->{_only} = { map { $_ => 0 } @modules };
+  }
+  return $self->{_only};
+}
+
+sub exclude {
+  my ($self, $exclude) = @_;
+  if ($exclude) {
+    $exclude =~ s/::/-/g;
+    my @modules = split q{,}, $exclude;
+    foreach (@modules) { $_ =~ s/(\S+)-[\d.]+$/$1/ };
+
+    $self->{_exclude} = { map { $_ => 0 } @modules };
+  }
+  return $self->{_exclude};
+}
 
 sub build_dir {
   my ($self, $dir) = @_;
@@ -176,9 +202,19 @@ sub run {
       if ( $recording and ( /^Result: (PASS|NA|FAIL|UNKNOWN)/ or /^-> (FAIL|OK)/ ) ) {
         my $result = $1;
         $result = 'PASS' if $result eq 'OK';
+
+        my $dist_without_version = $dist;
+        $dist_without_version =~ s/(\S+)-[\d.]+$/$1/;
+
         if (@test_output <= 2) {
             print "No test output found for '$dist'. Skipping...\n"
                 . "To send test reports, please make sure *NOT* to pass '-v' to cpanm or your build.log will contain no output to send.\n";
+        }
+        elsif ( defined $self->exclude && exists $self->exclude->{$dist_without_version} ) {
+            print "Skipping $dist as it's in the 'exclude' list...\n" if $self->verbose;
+        }
+        elsif ( defined $self->only && !exists $self->only->{$dist_without_version} ) {
+            print "Skipping $dist as it isn't in the 'only' list...\n" if $self->verbose;
         }
         else {
             my $report = $self->make_report($resource, $dist, $result, @test_output);

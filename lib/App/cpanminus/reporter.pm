@@ -54,6 +54,17 @@ sub new {
 
   $self->config( $config );
 
+  if ($params{cpanm}) {
+    my $cpanm = $self->_cpanm( $params{cpanm} );
+    $params{only} =~ s/-\d+(\.\d+)*$//; # strip version from cpanm's "only" data
+
+    # FIXME: cpanm doesn't provide an accessor here, so
+    # we break encapsulation in order to make sure we
+    # always have the right paths.
+    $params{build_dir}     = $cpanm->{home};
+    $params{build_logfile} = $cpanm->{log};
+  }
+
   $self->build_dir(
     $params{build_dir}
       || File::Spec->catdir( File::HomeDir->my_home, '.cpanm', 'latest-build' )
@@ -86,7 +97,6 @@ EOMESSAGE
   }
 
   $self->verbose( $params{verbose} || 0 );
-
   $self->exclude( $params{exclude} );
   $self->only( $params{only} );
 
@@ -152,6 +162,11 @@ sub build_logfile {
   return $self->{_build_logfile};
 }
 
+sub _cpanm {
+  my ($self, $cpanm) = @_;
+  $self->{_cpanm_object} = $cpanm if $cpanm;
+  return $self->{_cpanm_object};
+}
 
 sub run {
   my $self = shift;

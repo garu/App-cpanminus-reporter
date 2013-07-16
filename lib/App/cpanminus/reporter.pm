@@ -67,7 +67,7 @@ sub new {
 
   $self->build_dir(
     $params{build_dir}
-      || File::Spec->catdir( File::HomeDir->my_home, '.cpanm', 'latest-build' )
+      || File::Spec->catdir( File::HomeDir->my_home, '.cpanm' )
   );
 
   $self->build_logfile(

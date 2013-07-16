@@ -1,5 +1,19 @@
 Revision history for App-cpanminus-reporter
 
+0.10  2013-07-16
+    NEW FEATURES:
+      - new command line option, 'only' to enable just one
+        dist, or a group of comma-separated dists, for reporting (BBUSS)
+      - new command line option, 'exclude' to disable a dist, or
+        a group of comma-separated dists, for reporting (BBUSS)
+
+    BUG FIXES:
+      - works even on systems that don't support symlinks.
+
+    OTHER:
+      - catch errors happening when trying to send the report, showing
+        a nice error message instead of a confusing trace (BBUSS)
+
 0.09  2013-05-18
     BUG FIXES:
       - prevents prompt from being affected by PERL_MM_USE_DEFAULT

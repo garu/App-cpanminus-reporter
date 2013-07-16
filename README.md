@@ -41,6 +41,10 @@ Optional Arguments
 
     --setup                Sets up the CPAN Testers configuration for you
 
+    --only=A::B,C::D,...   Only send reports for these modules
+
+    --exclude=A::B,...     Don't send reports for these modules
+
 
 For more information, please refer to the full documentation at:
 

@@ -272,6 +272,7 @@ sub make_report {
   if (    $scheme ne 'http'
       and $scheme ne 'ftp'
       and $scheme ne 'cpan'
+      and $scheme ne 'file'
   ) {
     print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
       unless $self->quiet;

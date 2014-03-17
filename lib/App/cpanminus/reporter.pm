@@ -23,36 +23,11 @@ sub new {
   my ($class, %params) = @_;
   my $self = bless {}, $class;
 
-  $self->quiet( $params{quiet} );
-
-  my $config = CPAN::Testers::Common::Client::Config->new(
-    prompt => sub { local %ENV; IO::Prompt::Tiny::prompt(@_) },
+  $self->config(
+    CPAN::Testers::Common::Client::Config->new(
+      prompt => sub { local %ENV; IO::Prompt::Tiny::prompt(@_) },
+    )
   );
-  if ($params{setup}) {
-    $config->setup;
-    return;
-  }
-
-  my $config_filename = $config->get_config_filename;
-  if ( -e $config_filename ) {
-    if ( !$config->read ) {
-      print "Error reading CPAN Testers configuration file '$config_filename'. Aborting.";
-      return;
-    }
-  }
-  else {
-    my $answer = IO::Prompt::Tiny::prompt("CPAN Testers configuration file '$config_filename' not found. Would you like to set it up now? (y/n)", 'y');
-
-    if ( $answer =~ /^y/i ) {
-      $config->setup;
-    }
-    else {
-      print "The CPAN Testers configuration file is required. Aborting.\n";
-      return;
-    }
-  }
-
-  $self->config( $config );
 
   if ($params{cpanm}) {
     my $cpanm = $self->_cpanm( $params{cpanm} );
@@ -75,33 +50,14 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
-  # as a safety mechanism, we only let people parse build.log files
-  # if they were generated up to 30 minutes (1800 seconds) ago,
-  # unless the user asks us to --force it.
-  my $mtime = (stat $self->build_logfile)[9];
-  if ( !$params{force} && $mtime && time - $mtime > 1800 ) {
-      die <<'EOMESSAGE';
-Fatal: build.log was created longer than 30 minutes ago.
-
-As a standalone tool, it is important that you run cpanm-reporter
-as soon as you finish cpanm, otherwise your system data may have
-changed, from new libraries to a completely different perl binary.
-
-Because of that, this app will *NOT* parse build.log files last modified
-longer than 30 minutes before the moment it runs.
-
-You can override this behaviour by touching the file or passing
-a --force flag to cpanm-reporter, but please take good care to avoid
-sending bogus reports.
-EOMESSAGE
+  foreach my $method ( qw(quiet verbose force exclude only) ) {
+    $self->$method( $params{$method} ) if exists $params{$method};
   }
-
-  $self->verbose( $params{verbose} || 0 );
-  $self->exclude( $params{exclude} );
-  $self->only( $params{only} );
 
   return $self;
 }
+
+sub setup { shift->config->setup }
 
 ## basic accessors ##
 
@@ -117,6 +73,12 @@ sub verbose {
   return $self->{_verbose};
 }
 
+sub force {
+  my ($self, $force) = @_;
+  $self->{_force} = $force if $force;
+  return $self->{_force};
+}
+
 sub quiet {
   my ($self, $quiet) = @_;
   if ($quiet) {
@@ -130,7 +92,7 @@ sub only {
   my ($self, $only) = @_;
   if ($only) {
     $only =~ s/::/-/g;
-    my @modules = split q{,}, $only;
+    my @modules = split /\s*,\s*/, $only;
     foreach (@modules) { $_ =~ s/(\S+)-[\d.]+$/$1/ };
 
     $self->{_only} = { map { $_ => 0 } @modules };
@@ -142,7 +104,7 @@ sub exclude {
   my ($self, $exclude) = @_;
   if ($exclude) {
     $exclude =~ s/::/-/g;
-    my @modules = split q{,}, $exclude;
+    my @modules = split /\s*,\s*/, $exclude;
     foreach (@modules) { $_ =~ s/(\S+)-[\d.]+$/$1/ };
 
     $self->{_exclude} = { map { $_ => 0 } @modules };
@@ -168,8 +130,61 @@ sub _cpanm {
   return $self->{_cpanm_object};
 }
 
+sub _check_config_data {
+  my $self     = shift;
+  my $config   = $self->config;
+  my $filename = $config->get_config_filename;
+
+  if (-e $filename) {
+    if (!$config->read) {
+      print "Error reading CPAN Testers configuration file '$filename'. Aborting.";
+      return;
+    }
+  }
+  else {
+    my $answer = IO::Prompt::Tiny::prompt("CPAN Testers configuration file '$filename' not found. Would you like to set it up now? (y/n)", 'y');
+
+    if ( $answer =~ /^y/i ) {
+      $config->setup;
+    }
+    else {
+      print "The CPAN Testers configuration file is required. Aborting.\n";
+      return;
+    }
+  }
+  return 1;
+}
+
+sub _check_build_log {
+  my $self = shift;
+
+  # as a safety mechanism, we only let people parse build.log files
+  # if they were generated up to 30 minutes (1800 seconds) ago,
+  # unless the user asks us to --force it.
+  my $mtime = (stat $self->build_logfile)[9];
+  if ( !$self->force && $mtime && time - $mtime > 1800 ) {
+      print <<'EOMESSAGE';
+Fatal: build.log was created longer than 30 minutes ago.
+
+As a standalone tool, it is important that you run cpanm-reporter
+as soon as you finish cpanm, otherwise your system data may have
+changed, from new libraries to a completely different perl binary.
+
+Because of that, this app will *NOT* parse build.log files last modified
+longer than 30 minutes before the moment it runs.
+
+You can override this behaviour by touching the file or passing
+a --force flag to cpanm-reporter, but please take good care to avoid
+sending bogus reports.
+EOMESSAGE
+    return;
+  }
+  return 1;
+}
+
 sub run {
   my $self = shift;
+  return unless ($self->_check_config_data and $self->_check_build_log);
 
   my $logfile = $self->build_logfile;
   open my $fh, '<', $logfile

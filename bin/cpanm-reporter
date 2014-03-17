@@ -11,15 +11,21 @@ GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q
                           setup version help exclude=s only=s)
 ) or pod2usage();
 
-pod2usage if $options{help};
-
-if ($options{version}) {
-  print $App::cpanminus::reporter::VERSION . $/;
-  exit;
+if ($options{help}) {
+    pod2usage();
 }
-
-my $tester = App::cpanminus::reporter->new( %options );
-$tester->run() if $tester;
+elsif ($options{version}) {
+  print $App::cpanminus::reporter::VERSION . $/;
+}
+else {
+    my $tester = App::cpanminus::reporter->new( %options );
+    if ($options{setup}) {
+        $tester->setup();
+    }
+    else {
+        $tester->run();
+    }
+}
 
 __END__
 

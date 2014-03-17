@@ -201,6 +201,7 @@ sub run {
 
   $parser = sub {
     my ($dist, $resource) = @_;
+    (my $dist_vstring = $dist) =~ s/\-(\d+(?:\.\d)+)$/-v$1/ if $dist;
     my @test_output = ();
     my $recording = 0;
     my $str = '';
@@ -222,7 +223,7 @@ sub run {
         print "left $dep, $fetched\n" if $self->verbose;
         next;
       }
-      elsif ( $dist and /^Building and testing $dist/) {
+      elsif ( $dist and /^Building and testing (?:$dist|$dist_vstring)/) {
         print "recording $dist\n" if $self->verbose;
         $recording = 1;
       }

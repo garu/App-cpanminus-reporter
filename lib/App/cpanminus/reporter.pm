@@ -130,7 +130,7 @@ sub _cpanm {
   return $self->{_cpanm_object};
 }
 
-sub _check_config_data {
+sub _check_cpantesters_config_data {
   my $self     = shift;
   my $config   = $self->config;
   my $filename = $config->get_config_filename;
@@ -184,7 +184,7 @@ EOMESSAGE
 
 sub run {
   my $self = shift;
-  return unless ($self->_check_config_data and $self->_check_build_log);
+  return unless ($self->_check_cpantesters_config_data and $self->_check_build_log);
 
   my $logfile = $self->build_logfile;
   open my $fh, '<', $logfile

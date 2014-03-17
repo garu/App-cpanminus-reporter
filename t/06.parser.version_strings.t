@@ -5,7 +5,6 @@ use App::cpanminus::reporter;
 
 my $dir = -d 't' ? 't/data' : 'data';
 ok my $reporter = App::cpanminus::reporter->new(
-  verbose => 1,
   force => 1, # ignore mtime check on build.log
   build_logfile => $dir . '/build.version_strings.log', 
 ), 'created new reporter object';

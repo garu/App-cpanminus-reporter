@@ -106,6 +106,10 @@ path and name, you can set this variable to point at the new 'config.ini' file.
 
 =back
 
+If you called C<cpanm-reporter --setup>, you can also set C<PERL_MM_USE_DEFAULT>
+to true and it will answer any prompted question automatically with its default
+value, if possible.
+
 =head1 CAVEATS
 
 =over 4

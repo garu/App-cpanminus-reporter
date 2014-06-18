@@ -314,7 +314,7 @@ sub make_report {
     prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
   );
 
-  my $dist_file = join '/' => ($uri->path_segments)[-2,-1];
+  my $dist_file = $author . "/" . ($uri->path_segments)[-1];
   my $reporter = Test::Reporter->new(
     transport      => $self->config->transport_name,
     transport_args => $self->config->transport_args,

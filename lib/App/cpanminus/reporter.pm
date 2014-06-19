@@ -61,6 +61,19 @@ sub setup { shift->config->setup }
 
 ## basic accessors ##
 
+sub author {
+  my ($self, $author) = @_;
+  $self->{_author} = $author if $author;
+  return $self->{_author};
+}
+
+sub distfile {
+  my ($self, $distfile) = @_;
+  $self->{_distfile} = $distfile if $distfile;
+  return $self->{_distfile};
+}
+
+
 sub config {
   my ($self, $config) = @_;
   $self->{_config} = $config if $config;
@@ -280,8 +293,9 @@ sub get_author {
 }
 
 
-sub make_report {
-  my ($self, $resource, $dist, $result, @test_output) = @_;
+# returns false in case of error (so, skip!)
+sub parse_uri {
+  my ($self, $resource) = @_;
 
   my $uri = URI->new( $resource );
   my $scheme = lc $uri->scheme;
@@ -291,22 +305,36 @@ sub make_report {
   ) {
     print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
       unless $self->quiet;
-    return;
+    return 0;
   }
+
 
   my $author = $self->get_author( $uri->path );
   unless ($author) {
     print "error fetching author for resource '$resource'. Skipping...\n"
       unless $self->quiet;
-    return;
+    return 0;
   }
 
+  $self->author($author);
+
+  $self->distfile($author . "/" . ($uri->path_segments)[-1]);
+
+  return 1;
+}
+
+sub make_report {
+  my ($self, $resource, $dist, $result, @test_output) = @_;
+
+  return unless $self->parse_uri($resource);
+
+  my $author = $self->config('author');
   print "sending: ($resource, $author, $dist, $result)\n" unless $self->quiet;
 
   my $cpanm_version = $self->{_cpanminus_version} || 'unknown cpanm version';
   my $meta = $self->get_meta_for( $dist );
   my $client = CPAN::Testers::Common::Client->new(
-    author      => $author,
+    author      => $self->author,
     distname    => $dist,
     grade       => $result,
     via         => "App::cpanminus::reporter $VERSION ($cpanm_version)",
@@ -314,13 +342,12 @@ sub make_report {
     prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
   );
 
-  my $dist_file = $author . "/" . ($uri->path_segments)[-1];
   my $reporter = Test::Reporter->new(
     transport      => $self->config->transport_name,
     transport_args => $self->config->transport_args,
     grade          => $client->grade,
     distribution   => $dist,
-    distfile       => $dist_file,
+    distfile       => $self->distfile,
     from           => $self->config->email_from,
     comments       => $client->email,
     via            => $client->via,

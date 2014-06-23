@@ -294,6 +294,12 @@ sub make_report {
     return;
   }
 
+  if ( index($dist, 'Local-') == 0 ) {
+      print "'Local::' namespace is reserved. Skipping resource '$resource'\n"
+        unless $self->quiet;
+      return;
+  }
+
   my $author = $self->get_author( $uri->path );
   unless ($author) {
     print "error fetching author for resource '$resource'. Skipping...\n"

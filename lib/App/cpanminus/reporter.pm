@@ -300,6 +300,11 @@ sub make_report {
       unless $self->quiet;
     return;
   }
+  
+  if ($author eq 'LOCAL') {
+    print "skipping: ($resource, $author, $dist, $result)\n" unless $self->quiet;
+    return;
+  }
 
   print "sending: ($resource, $author, $dist, $result)\n" unless $self->quiet;
 

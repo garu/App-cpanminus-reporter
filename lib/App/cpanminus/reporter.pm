@@ -300,9 +300,11 @@ sub make_report {
       unless $self->quiet;
     return;
   }
-  
+
+  # the 'LOCAL' user is reserved and should never send reports.
   if ($author eq 'LOCAL') {
-    print "skipping: ($resource, $author, $dist, $result)\n" unless $self->quiet;
+    print "'LOCAL' user is reserved. Skipping resource '$resource'\n"
+      unless $self->quiet;
     return;
   }
 

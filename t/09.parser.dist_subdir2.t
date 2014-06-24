@@ -22,7 +22,7 @@ sub test_reporter_new {
     is_deeply [ sort keys %params ], \@params,
               'arguments properly passed to Test::Reporter';
 
-    is $params{distfile}, 'modules/Term-ReadLine-Perl-1.0303.tar.gz'
+    is $params{distfile}, 'ILYAZ/modules/Term-ReadLine-Perl-1.0303.tar.gz'
        => 'distfile is properly set';
 
     is $params{distribution}, 'Term-ReadLine-Perl-1.0303'
@@ -41,7 +41,7 @@ sub test_reporter_new {
 }
 sub test_reporter_send {
     my $self = shift;
-    pass 'Tets::Reporter::send called';
+    pass 'Test::Reporter::send called';
     return 1;
 }
 

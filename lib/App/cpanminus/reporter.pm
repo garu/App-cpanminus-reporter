@@ -212,6 +212,9 @@ sub run {
   my $found = 0;
   my $parser;
 
+  # we could go over 100 levels deep on the dependency track
+  no warnings 'recursion';
+
   $parser = sub {
     my ($dist, $resource) = @_;
     (my $dist_vstring = $dist) =~ s/\-(\d+(?:\.\d)+)$/-v$1/ if $dist;

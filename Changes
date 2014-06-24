@@ -1,5 +1,16 @@
 Revision history for App-cpanminus-reporter
 
+0.11  2014-06-24
+    BUG FIXES:
+      - Github #11 - Proper handling of vstrings on parser log (KENTNL)
+      - Ignoring modules from the LOCAL user (PLICEASE)
+      - Ignoring modules from the 'Local::' namespace (ETHER)
+      - Avoid 'deep recursion' warning
+
+    OTHER:
+      - several more tests written.
+      - documenting PERL_MM_USE_DEFAULT behaviour on prompts.
+
 0.10  2013-07-16
     NEW FEATURES:
       - new command line option, 'only' to enable just one

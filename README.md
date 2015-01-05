@@ -1,6 +1,11 @@
 App-cpanminus-reporter
 ======================
 
+[![Build status](https://api.travis-ci.org/garu/App-cpanminus-reporter.png)](https://api.travis-ci.org/garu/App-cpanminus-reporter.png)
+[![Coverage Status](https://coveralls.io/repos/garu/App-cpanminus-reporter/badge.png)](https://coveralls.io/r/garu/App-cpanminus-reporter)
+[![CPAN version](https://badge.fury.io/pl/App-cpanminus-reporter.png)](http://badge.fury.io/pl/App-cpanminus-reporter)
+
+
 This distribution creates a tiny app called `cpanm-reporter` that lets
 you send cpanm output to CPAN Testers.
 

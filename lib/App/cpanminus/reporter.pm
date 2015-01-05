@@ -309,6 +309,7 @@ sub parse_uri {
   my $uri = URI->new( $resource );
   my $scheme = lc $uri->scheme;
   if (    $scheme ne 'http'
+      and $scheme ne 'https'
       and $scheme ne 'ftp'
       and $scheme ne 'cpan'
   ) {

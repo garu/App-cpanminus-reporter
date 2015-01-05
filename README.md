@@ -45,6 +45,8 @@ Optional Arguments
 
     --exclude=A::B,...     Don't send reports for these modules
 
+    --dry-run              Prepare, but do not actually send reports
+
 
 For more information, please refer to the full documentation at:
 

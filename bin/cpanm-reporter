@@ -8,7 +8,7 @@ use Pod::Usage;
 
 my %options = ();
 GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q
-                          setup version help exclude=s only=s dry_run)
+                          setup version help exclude=s only=s dry-run)
 ) or pod2usage();
 
 if ($options{help}) {
@@ -74,7 +74,7 @@ then, just call cpanm-reporter:
 
    --exclude=A::B,...     Don't send reports for these modules
    
-   --dry_run              Prepare, but do not actually send reports
+   --dry-run              Prepare, but do not actually send reports
 
 
 =head1 DESCRIPTION

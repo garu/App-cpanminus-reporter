@@ -1,5 +1,12 @@
 Revision history for App-cpanminus-reporter
 
+0.12  2015-01-05
+    NEW FEATURES:
+      - new "--dry-run" option (PLICEASE)
+
+    BUG FIXES:
+      - supporting HTTPS (PLICEASE)
+
 0.11  2014-06-24
     BUG FIXES:
       - Github #11 - Proper handling of vstrings on parser log (KENTNL)

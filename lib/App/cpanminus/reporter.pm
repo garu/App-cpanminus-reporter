@@ -50,8 +50,10 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
-  foreach my $method ( qw(quiet verbose force exclude only dry_run) ) {
-    $self->$method( $params{$method} ) if exists $params{$method};
+  foreach my $option ( qw(quiet verbose force exclude only dry-run) ) {
+    my $method = $option;
+    $method =~ s/\-/_/g;
+    $self->$method( $params{$option} ) if exists $params{$option};
   }
 
   return $self;

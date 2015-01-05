@@ -50,7 +50,7 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
-  foreach my $method ( qw(quiet verbose force exclude only) ) {
+  foreach my $method ( qw(quiet verbose force exclude only dry_run) ) {
     $self->$method( $params{$method} ) if exists $params{$method};
   }
 
@@ -99,6 +99,12 @@ sub quiet {
     $self->{_quiet} = 1;
   }
   return $self->{_quiet};
+}
+
+sub dry_run {
+  my ($self, $dry_run) = @_;
+  $self->{_dry_run} = $dry_run if $dry_run;
+  $self->{_dry_run};
 }
 
 sub only {
@@ -366,6 +372,11 @@ sub make_report {
     comments       => $client->email,
     via            => $client->via,
   );
+
+  if ($self->dry_run) {
+    print "not sending (drun run)\n" unless $self->quiet;
+    return;
+  }
 
   try {
     $reporter->send() || die $reporter->errstr();

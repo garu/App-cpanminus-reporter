@@ -177,15 +177,15 @@ sub _check_cpantesters_config_data {
 }
 
 sub _check_build_log {
-  my $self = shift;
+  my ($self, $build_logfile) = @_;
 
   # as a safety mechanism, we only let people parse build.log files
   # if they were generated up to 30 minutes (1800 seconds) ago,
   # unless the user asks us to --force it.
-  my $mtime = (stat $self->build_logfile)[9];
+  my $mtime = (stat $build_logfile)[9];
   if ( !$self->force && $mtime && time - $mtime > 1800 ) {
       print <<'EOMESSAGE';
-Fatal: build.log was created longer than 30 minutes ago.
+$build_logfile was created more than 30 minutes ago.
 
 As a standalone tool, it is important that you run cpanm-reporter
 as soon as you finish cpanm, otherwise your system data may have
@@ -205,9 +205,15 @@ EOMESSAGE
 
 sub run {
   my $self = shift;
-  return unless ($self->_check_cpantesters_config_data and $self->_check_build_log);
+  return unless $self->_check_cpantesters_config_data;
+  $self->process_logfile($self->build_logfile);
+}
 
-  my $logfile = $self->build_logfile;
+sub process_logfile {
+  my ($self, $logfile) = @_;
+
+  return unless $self->_check_build_log($logfile);
+
   open my $fh, '<', $logfile
     or Carp::croak "error opening build log file '$logfile' for reading: $!";
 

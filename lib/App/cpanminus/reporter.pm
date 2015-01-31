@@ -14,6 +14,7 @@ use CPAN::Testers::Common::Client::Config;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
 use Try::Tiny;
+use Path::Tiny;
 use URI;
 use Metabase::Resource;
 use Capture::Tiny qw(capture);
@@ -50,7 +51,9 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
-  foreach my $option ( qw(quiet verbose force exclude only dry-run) ) {
+  $self->max_age($params{max_age} || 30);
+
+  foreach my $option ( qw(quiet verbose force exclude only dry-run all) ) {
     my $method = $option;
     $method =~ s/\-/_/g;
     $self->$method( $params{$option} ) if exists $params{$option};
@@ -86,6 +89,18 @@ sub verbose {
   my ($self, $verbose) = @_;
   $self->{_verbose} = $verbose if $verbose;
   return $self->{_verbose};
+}
+
+sub all {
+  my ($self, $all) = @_;
+  $self->{_all} = $all if $all;
+  return $self->{_all};
+}
+
+sub max_age {
+  my ($self, $max_age) = @_;
+  $self->{_max_age} = $max_age if $max_age;
+  return $self->{_max_age};
 }
 
 sub force {
@@ -176,43 +191,82 @@ sub _check_cpantesters_config_data {
   return 1;
 }
 
+# Returns 1 if log is fresh enough, 0 if it is too old.
+# Optional second param asks to shorten instructions (used
+# when multiple files are processed)
 sub _check_build_log {
-  my ($self, $build_logfile) = @_;
+  my ($self, $build_logfile, $short_instructions) = @_;
+
+  my $max_age = $self->max_age;
 
   # as a safety mechanism, we only let people parse build.log files
   # if they were generated up to 30 minutes (1800 seconds) ago,
   # unless the user asks us to --force it.
   my $mtime = (stat $build_logfile)[9];
-  if ( !$self->force && $mtime && time - $mtime > 1800 ) {
-      print <<'EOMESSAGE';
-$build_logfile was created more than 30 minutes ago.
+  my $age_in_minutes = int((time - $mtime) / 60);
+  if ( !$self->force && $mtime && $age_in_minutes > $max_age ) {
+    if($short_instructions) {
+      print << "EOMESSAGE";
+Skipping $build_logfile, it is too old (modified $age_in_minutes minutes ago > $max_age).
+EOMESSAGE
+    } else {
+      print <<"EOMESSAGE";
+$build_logfile is too old (created $age_in_minutes minutes ago).
 
-As a standalone tool, it is important that you run cpanm-reporter
-as soon as you finish cpanm, otherwise your system data may have
-changed, from new libraries to a completely different perl binary.
+As a standalone tool, it is important that you run cpanm-reporter as
+soon as you finish cpanm, otherwise your system data may have changed,
+from new libraries to a completely different perl binary.
 
-Because of that, this app will *NOT* parse build.log files last modified
-longer than 30 minutes before the moment it runs.
+Because of that, this app will *NOT* parse build.log files which are
+too old (by default: which are last modified more than 30 minutes ago).
 
-You can override this behaviour by touching the file or passing
-a --force flag to cpanm-reporter, but please take good care to avoid
+You can override this behaviour by touching the file, passing
+--max-age option or --force flag, but please take good care to avoid
 sending bogus reports.
 EOMESSAGE
+    }
     return;
   }
   return 1;
 }
 
+sub _all_logfiles {
+  my $self = shift;
+  my $build_dir = path($self->build_dir);
+  my $work_dir = $build_dir->child("work");
+  unless($work_dir->exists) {
+    print <<"ENDOFM";
+Can not find cpanm work directory (tried $work_dir).
+Please specify top cpanm dir as --build-dir, or do not
+specify --build-dir if it is in ~/.cpanm.
+ENDOFM
+    return;
+  }
+  return grep { $_->is_file }
+         map { $_->child("build.log") }
+         grep { $_->is_dir }
+         $work_dir->children;
+}
+
+
 sub run {
   my $self = shift;
   return unless $self->_check_cpantesters_config_data;
-  $self->process_logfile($self->build_logfile);
+  unless($self->all) {
+    # Default mode, processing last logfile
+    $self->process_logfile($self->build_logfile);
+  } else {
+    # all mode, looking for any possible file
+    foreach my $logfile ($self->_all_logfiles) {
+      $self->process_logfile($logfile, 1); # Short instructions in this case
+    }
+  }
 }
 
 sub process_logfile {
-  my ($self, $logfile) = @_;
+  my ($self, $logfile, $skip_instructions) = @_;
 
-  return unless $self->_check_build_log($logfile);
+  return unless $self->_check_build_log($logfile, $skip_instructions);
 
   open my $fh, '<', $logfile
     or Carp::croak "error opening build log file '$logfile' for reading: $!";

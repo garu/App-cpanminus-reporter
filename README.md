@@ -1,7 +1,7 @@
 App-cpanminus-reporter
 ======================
 
-[![Build status](https://api.travis-ci.org/garu/App-cpanminus-reporter.png)](https://api.travis-ci.org/garu/App-cpanminus-reporter.png)
+[![Build status](https://travis-ci.org/garu/App-cpanminus-reporter.svg?branch=master)](https://travis-ci.org/garu/App-cpanminus-reporter)
 [![Coverage Status](https://coveralls.io/repos/garu/App-cpanminus-reporter/badge.png)](https://coveralls.io/r/garu/App-cpanminus-reporter)
 [![CPAN version](https://badge.fury.io/pl/App-cpanminus-reporter.png)](http://badge.fury.io/pl/App-cpanminus-reporter)
 

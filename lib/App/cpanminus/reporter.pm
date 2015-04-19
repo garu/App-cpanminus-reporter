@@ -357,7 +357,6 @@ sub make_report {
   return unless $self->parse_uri($resource);
 
   my $author = $self->author;
-  print "sending: ($resource, $author, $dist, $result)\n" unless $self->quiet;
 
   my $cpanm_version = $self->{_cpanminus_version} || 'unknown cpanm version';
   my $meta = $self->get_meta_for( $dist );
@@ -371,9 +370,12 @@ sub make_report {
   );
 
   if (!$self->skip_history && $client->is_duplicate) {
-    print "($resource, $author, $dist, $result) was already sent. Skipping..."
+    print "($resource, $author, $dist, $result) was already sent. Skipping...\n"
       if $self->verbose;
     return;
+  }
+  else {
+    print "sending: ($resource, $author, $dist, $result)\n" unless $self->quiet;
   }
 
   my $reporter = Test::Reporter->new(

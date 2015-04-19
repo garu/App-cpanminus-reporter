@@ -1,5 +1,11 @@
 Revision history for App-cpanminus-reporter
 
+0.13  2015-04-19
+    NEW FEATURES:
+      - now cpanm-reporter understands the history file from other
+        CPAN Testers' clients! It should work seamlessly, and you
+        can disable it by passing the '--skip-history' (GARU)
+
 0.12  2015-01-05
     NEW FEATURES:
       - new "--dry-run" option (PLICEASE)

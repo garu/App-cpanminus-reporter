@@ -52,6 +52,8 @@ Optional Arguments
 
     --dry-run              Prepare, but do not actually send reports
 
+    --skip-history         Skips reading/writing to CPAN Testers' history file
+
 
 For more information, please refer to the full documentation at:
 

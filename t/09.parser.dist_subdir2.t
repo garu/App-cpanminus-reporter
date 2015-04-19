@@ -7,9 +7,10 @@ use App::cpanminus::reporter;
 my $dir = -d 't' ? 't/data' : 'data';
 
 ok my $reporter = App::cpanminus::reporter->new(
-  force         => 1, # ignore mtime check on build.log
-  build_logfile => $dir . '/build.dist_subdir.log',
-  quiet         => 1,
+  force          => 1, # ignore mtime check on build.log
+  build_logfile  => $dir . '/build.dist_subdir.log',
+  quiet          => 1,
+  'skip-history' => 1,
 ), 'created new reporter object';
 
 sub test_reporter_new {

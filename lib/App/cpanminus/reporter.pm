@@ -9,7 +9,7 @@ use Carp ();
 use File::Spec     3.19;
 use File::HomeDir  0.58 ();
 use Test::Reporter 1.54;
-use CPAN::Testers::Common::Client 0.06;
+use CPAN::Testers::Common::Client 0.10;
 use CPAN::Testers::Common::Client::Config;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
@@ -50,7 +50,7 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
-  foreach my $option ( qw(quiet verbose force exclude only dry-run) ) {
+  foreach my $option ( qw(quiet verbose force exclude only dry-run skip-history) ) {
     my $method = $option;
     $method =~ s/\-/_/g;
     $self->$method( $params{$option} ) if exists $params{$option};
@@ -74,7 +74,6 @@ sub distfile {
   $self->{_distfile} = $distfile if $distfile;
   return $self->{_distfile};
 }
-
 
 sub config {
   my ($self, $config) = @_;
@@ -107,6 +106,12 @@ sub dry_run {
   my ($self, $dry_run) = @_;
   $self->{_dry_run} = $dry_run if $dry_run;
   $self->{_dry_run};
+}
+
+sub skip_history {
+    my ($self, $skip) = @_;
+    $self->{_skip_history} = $skip if $skip;
+    $self->{_skip_history};
 }
 
 sub only {
@@ -365,6 +370,12 @@ sub make_report {
     prereqs     => ($meta && ref $meta) ? $meta->{prereqs} : undef,
   );
 
+  if (!$self->skip_history && $client->is_duplicate) {
+    print "($resource, $author, $dist, $result) was already sent. Skipping..."
+      if $self->verbose;
+    return;
+  }
+
   my $reporter = Test::Reporter->new(
     transport      => $self->config->transport_name,
     transport_args => $self->config->transport_args,
@@ -387,6 +398,8 @@ sub make_report {
   catch {
     print "Error while sending this report, continuing with the next one...\n" unless $self->quiet;
     print "DEBUG: @_" if $self->verbose;
+  } finally{
+    $client->record_history unless $self->skip_history;
   };
   return;
 }

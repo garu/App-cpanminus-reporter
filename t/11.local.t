@@ -16,9 +16,10 @@ sub via   { Test::More::pass 'client "via" called'; 1   }
 package main;
 my $dir = -d 't' ? 't/data' : 'data';
 ok my $reporter = App::cpanminus::reporter->new(
-    force         => 1, # ignore mtime check on build.log
-    build_logfile => $dir . 'build.single.log',
-    quiet         => 1,
+    force          => 1, # ignore mtime check on build.log
+    build_logfile  => $dir . 'build.single.log',
+    quiet          => 1,
+    'skip-history' => 1,
 ), 'created new reporter object';
 
 is $reporter->quiet, 1, 'reporter is quiet';

@@ -3,7 +3,7 @@ Changes
 lib/App/cpanminus/reporter.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/00.load.t
 t/01.basic.t
 t/02.parser.single.t

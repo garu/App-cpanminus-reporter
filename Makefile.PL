@@ -10,6 +10,7 @@ WriteMakefile(
     LICENSE             => 'perl',
     PL_FILES            => {},
     PREREQ_PM => {
+        'perl'                          => '5.008005'
         'CPAN::Meta::Converter'         => 0,
         'CPAN::Testers::Common::Client' => 0.10,
         'Capture::Tiny'                 => 0,

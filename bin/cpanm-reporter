@@ -9,7 +9,7 @@ use Pod::Usage;
 my %options = ();
 GetOptions( \%options, qw(build_dir=s build_logfile=s verbose|v force quiet|q
                           setup version help exclude=s only=s dry-run
-                          skip-history)
+                          skip-history ignore-versions)
 ) or pod2usage();
 
 if ($options{help}) {
@@ -141,6 +141,13 @@ installing distributions with C<cpanm> and generating/sending the reports with
 C<cpanm-reporter>. If you're not a power user, you don't have to worry about
 this. Just remember to run cpanm-reporter immediately after cpanm and
 everything will be fine :)
+
+As an added precaution, cpanm-reporter will skip build.log entries in which
+the Perl version recorded in the build.log is different than the Perl version
+that is generating the report. The entries will be skipped silently unless
+the C<--verbose> or C<-v> flag is passed. This version check can be ignored
+by passing the C<--ignore-versions> flag to cpanm-reporter. Obviously, this
+is discouraged since it would result in the sending of bogus reports.
 
 =back
 

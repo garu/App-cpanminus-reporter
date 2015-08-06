@@ -9,7 +9,10 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/App/cpanminus/reporter.pm',
     LICENSE             => 'perl',
     PL_FILES            => {},
-    MIN_PERL_VERSION    => '5.8.1',
+    ($ExtUtils::MakeMaker::VERSION >= 6.48
+        ? (MIN_PERL_VERSION    => '5.8.1')
+        : ()
+    ),
     PREREQ_PM => {
         'CPAN::Meta::Converter'         => 0,
         'CPAN::Testers::Common::Client' => 0.10,

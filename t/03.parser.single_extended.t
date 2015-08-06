@@ -7,7 +7,7 @@ my $dir = -d 't' ? 't/data' : 'data';
 ok my $reporter = App::cpanminus::reporter->new(
   force => 1, # ignore mtime check on build.log
   build_logfile => $dir . '/build.single_extended.log', 
-  ignore_versions => 1,
+  'ignore-versions' => 1,
 ), 'created new reporter object';
 
 sub test_make_report {

@@ -11,7 +11,7 @@ ok my $reporter = App::cpanminus::reporter->new(
   build_logfile  => $dir . '/build.dist_subdir.log',
   quiet          => 1,
   'skip-history' => 1,
-  ignore_versions => 1,
+  'ignore-versions' => 1,
 ), 'created new reporter object';
 
 sub test_reporter_new {

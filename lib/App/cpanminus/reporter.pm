@@ -9,7 +9,7 @@ use Carp ();
 use File::Spec     3.19;
 use File::HomeDir  0.58 ();
 use Test::Reporter 1.54;
-use CPAN::Testers::Common::Client 0.10;
+use CPAN::Testers::Common::Client 0.11;
 use CPAN::Testers::Common::Client::Config;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
@@ -227,12 +227,12 @@ sub run {
 
   # we could go over 100 levels deep on the dependency track
   no warnings 'recursion';
-
   $parser = sub {
     my ($dist, $resource) = @_;
     (my $dist_vstring = $dist) =~ s/\-(\d+(?:\.\d)+)$/-v$1/ if $dist;
     my @test_output = ();
     my $recording = 0;
+    my $testing = 0;
     my $str = '';
     my $fetched;
 
@@ -252,8 +252,9 @@ sub run {
         print "left $dep, $fetched\n" if $self->verbose;
         next;
       }
-      elsif ( $dist and /^Building and testing (?:$dist|$dist_vstring)/) {
+      elsif ( $dist and /^Building .*(?:$dist|$dist_vstring)/) {
         print "recording $dist\n" if $self->verbose;
+        $testing = 1 if /and testing/;
         $recording = 1;
       }
 
@@ -261,7 +262,9 @@ sub run {
 
       if ( $recording and ( /^Result: (PASS|NA|FAIL|UNKNOWN)/ or /^-> (FAIL|OK)/ ) ) {
         my $result = $1;
-        $result = 'PASS' if $result eq 'OK';
+        if ($result eq 'OK') {
+            $result = ($testing ? 'PASS' : 'UNKNOWN');
+        }
 
         my $dist_without_version = $dist;
         $dist_without_version =~ s/(\S+)-[\d.]+$/$1/;

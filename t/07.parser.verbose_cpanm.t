@@ -7,7 +7,7 @@ use Capture::Tiny qw( capture_stdout );
 my $dir = -d 't' ? 't/data' : 'data';
 ok my $reporter = App::cpanminus::reporter->new(
   force => 1, # ignore mtime check on build.log
-  build_logfile => $dir . '/build.verbose_cpanm.log', 
+  build_logfile => $dir . '/build.verbose_cpanm.log',
 ), 'created new reporter object';
 
 sub test_make_report {

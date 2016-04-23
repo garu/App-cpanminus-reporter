@@ -1,26 +1,36 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use App::cpanminus::reporter;
 
 my $dir = -d 't' ? 't/data' : 'data';
 ok my $reporter = App::cpanminus::reporter->new(
   force => 1, # ignore mtime check on build.log
-  build_logfile => $dir . '/build.configure_failed.log',
+  build_logfile => $dir . '/build.missing.log',
 ), 'created new reporter object';
 
+my @parsed = (
+    {
+        author => 'FDALY',
+        dist   => 'FDALY/Test-Tester-0.109.tar.gz',
+        result => 'PASS',
+    },
+    {
+        author => 'AUDREYT',
+        dist   => 'AUDREYT/Test-use-ok-0.11.tar.gz',
+        result => 'PASS',
+    },
+);
+
+my $i = 0;
 sub test_make_report {
   my ($self, $resource, $dist, $result, @test_output) = @_;
+
   $self->parse_uri($resource);
-  is $self->author, 'BOBW', 'found the right author';
-  is(
-    $self->distfile,
-    'BOBW/X86-Udis86-1.7.2.3.tar.gz',
-    'found the right dist'
-  );
-  is $result, 'NA', 'found the right result';
-  is $test_output[0], "Running Makefile.PL\n";
-  is $test_output[-1], "-> FAIL Configure failed for X86-Udis86-v1.7.2.3. See /Users/garu/.cpanm/work/1395033276.12482/build.log for details.\n";
+  is $self->author, $parsed[$i]->{author}, 'found the right author';
+  is $self->distfile, $parsed[$i]->{dist}, 'found the right dist';
+  is $result, $parsed[$i]->{result}, 'found the right result';
+  $i++;
 }
 
 {

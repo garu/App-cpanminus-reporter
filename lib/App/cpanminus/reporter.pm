@@ -231,9 +231,9 @@ sub run {
     my ($dist, $resource) = @_;
     (my $dist_vstring = $dist) =~ s/\-(\d+(?:\.\d)+)$/-v$1/ if $dist;
     my @test_output = ();
-    my $recording = 0;
-    my $testing = 0;
-    my $str = '';
+    my $recording;
+    my $has_tests = 0;
+    my $found_na;
     my $fetched;
 
     while (<$fh>) {
@@ -245,33 +245,63 @@ sub run {
       elsif ( /^Entering (\S+)/ ) {
         my $dep = $1;
         $found = 1;
-        Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording;
-        Carp::croak "Parsing error. Found '$dep' without fetching first." unless $resource;
+        Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording && $recording eq 'test';
         print "entering $dep, $fetched\n" if $self->verbose;
         $parser->($dep, $fetched);
         print "left $dep, $fetched\n" if $self->verbose;
         next;
       }
+      elsif ( /^Running (?:Build|Makefile)\.PL/ ) {
+        $recording = 'configure';
+      }
       elsif ( $dist and /^Building .*(?:$dist|$dist_vstring)/) {
         print "recording $dist\n" if $self->verbose;
-        $testing = 1 if /and testing/;
-        $recording = 1;
+        $has_tests = 1 if /and testing/;
+        # if we got here, we need to flush the test output
+        # (so far filled with 'configure' output) and start
+        # recording the actual tests.
+        @test_output = ();
+        $recording = 'test';
       }
 
       push @test_output, $_ if $recording;
 
-      if ( $recording and ( /^Result: (PASS|NA|FAIL|UNKNOWN)/ or /^-> (FAIL|OK)/ ) ) {
-        my $result = $1;
-        if ($result eq 'OK') {
-            $result = ($testing ? 'PASS' : 'UNKNOWN');
+      my $result;
+      if ($recording) {
+        if (   /^Result: (PASS|NA|FAIL|UNKNOWN)/
+           || ($recording eq 'test' && /^-> (FAIL|OK)/)
+        ) {
+          $result = $1;
+          if ($result eq 'FAIL' && $recording eq 'configure') {
+            $result = 'NA';
+          }
+          elsif ($result eq 'OK') {
+            $result = $has_tests ? 'PASS' : 'UNKNOWN';
+          }
         }
-
+        elsif ( $recording eq 'configure' && /^-> N\/A/ ) {
+            $found_na = 1;
+        }
+        elsif (  $recording eq 'configure'
+            # https://github.com/miyagawa/cpanminus/blob/devel/lib/App/cpanminus/script.pm#L2269
+              && ( /Configure failed for (?:$dist|$dist_vstring)/
+                || /proper Makefile.PL\/Build.PL/
+                || /configure the distribution/
+              )
+        ) {
+            $result = $found_na ? 'NA' : 'UNKNOWN';
+        }
+      }
+      if ($result) {
         my $dist_without_version = $dist;
         $dist_without_version =~ s/(\S+)-[\d.]+$/$1/;
 
         if (@test_output <= 2) {
             print "No test output found for '$dist'. Skipping...\n"
                 . "To send test reports, please make sure *NOT* to pass '-v' to cpanm or your build.log will contain no output to send.\n";
+        }
+        elsif (!$resource) {
+            print "Skipping report for local installation of '$dist'.\n";
         }
         elsif ( defined $self->exclude && exists $self->exclude->{$dist_without_version} ) {
             print "Skipping $dist as it's in the 'exclude' list...\n" if $self->verbose;

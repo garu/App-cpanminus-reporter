@@ -246,9 +246,9 @@ sub run {
         my $dep = $1;
         $found = 1;
         Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording && $recording eq 'test';
-        print "entering $dep, $fetched\n" if $self->verbose;
+        print "entering $dep, " . ($fetched || '(local)') . "\n" if $self->verbose;
         $parser->($dep, $fetched);
-        print "left $dep, $fetched\n" if $self->verbose;
+        print "left $dep, " . ($fetched || '(local)') . "\n" if $self->verbose;
         next;
       }
       elsif ( /^Running (?:Build|Makefile)\.PL/ ) {

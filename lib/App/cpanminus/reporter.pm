@@ -227,6 +227,14 @@ sub run {
     $self->{_cpanminus_version} = $1;
     $self->{_perl_version} = $2;
   }
+  else {
+      Carp::croak(
+          'Unable to find cpanminus/perl versions on build.log. '
+        . 'Please update App::cpanminus. If you think this is a mistake, '
+        . 'please send us a bug report with your version of App::cpanminus, '
+        . 'App::cpanminus::reporter, perl -V and your failing build.log file.'
+      );
+  }
 
   my $found = 0;
   my $parser;
@@ -319,7 +327,7 @@ sub run {
             print "Skipping $dist as it isn't in the 'only' list...\n" if $self->verbose;
         }
         elsif ( !$self->ignore_versions && defined $self->{_perl_version} && ( $self->{_perl_version} ne $] ) ) {
-            print "Skipping $dist as it's build Perl version ($self->{_perl_version}) differs from the currently running perl ($])...\n" if $self->verbose;
+            print "Skipping $dist as its build Perl version ($self->{_perl_version}) differs from the currently running perl ($])...\n" if $self->verbose;
         }
         else {
             my $report = $self->make_report($resource, $dist, $result, @test_output);

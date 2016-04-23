@@ -268,7 +268,7 @@ sub run {
 
       my $result;
       if ($recording) {
-        if (   /^Result: (PASS|NA|FAIL|UNKNOWN)/
+        if (   /^Result: (PASS|NA|FAIL|UNKNOWN|NOTESTS)/
            || ($recording eq 'test' && /^-> (FAIL|OK)/)
         ) {
           $result = $1;
@@ -277,6 +277,9 @@ sub run {
           }
           elsif ($result eq 'OK') {
             $result = $has_tests ? 'PASS' : 'UNKNOWN';
+          }
+          elsif ($result eq 'NOTESTS') {
+              $result = 'UNKNOWN';
           }
         }
         elsif ( $recording eq 'configure' && /^-> N\/A/ ) {

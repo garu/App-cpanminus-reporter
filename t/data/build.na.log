@@ -1,3 +1,5 @@
+cpanm (App::cpanminus) 1.7030 on perl 5.021011 built for darwin-2level
+(...)
 Searching Dist::Zilla::Plugin::MungeFile::WithDataSection () on metacpan ...
 --> Working on Dist::Zilla::Plugin::MungeFile::WithDataSection
 Fetching http://www.cpan.org/authors/id/E/ET/ETHER/Dist-Zilla-Plugin-MungeFile-WithDataSection-0.007.tar.gz

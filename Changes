@@ -1,5 +1,21 @@
 Revision history for App-cpanminus-reporter
 
+0.14 2016-04-23
+    NEW FEATURES:
+        - support for cpanm --installdeps .
+        - local installations are just skipped now, instead of aborting the
+          entire thing.
+    BUG FIXES:
+        - improving the parser so it handles UNKNOWN/NA outputs properly
+          (distributions with no tests, etc).
+        - support for explicit NOTESTS results.
+        - reports are skipped when current/tested
+          perl versions mismatch (Michael LaGrasta)
+        - added minimal perl version (Michael LaGrasta)
+    OTHER:
+        - improved some error messages with likely diagnostics.
+        - significantly increased test coverage.
+
 0.13  2015-04-19
     NEW FEATURES:
       - now cpanm-reporter understands the history file from other

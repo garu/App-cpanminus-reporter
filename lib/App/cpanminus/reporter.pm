@@ -50,7 +50,7 @@ sub new {
       || File::Spec->catfile( $self->build_dir, 'build.log' )
   );
 
-  foreach my $option ( qw(quiet verbose force exclude only dry-run skip-history) ) {
+  foreach my $option ( qw(quiet verbose force exclude only dry-run skip-history ignore-versions) ) {
     my $method = $option;
     $method =~ s/\-/_/g;
     $self->$method( $params{$option} ) if exists $params{$option};
@@ -91,6 +91,12 @@ sub force {
   my ($self, $force) = @_;
   $self->{_force} = $force if $force;
   return $self->{_force};
+}
+
+sub ignore_versions {
+  my ($self, $ignore_versions) = @_;
+  $self->{_ignore_versions} = $ignore_versions if $ignore_versions;
+  return $self->{_ignore_versions};
 }
 
 sub quiet {
@@ -311,6 +317,9 @@ sub run {
         }
         elsif ( defined $self->only && !exists $self->only->{$dist_without_version} ) {
             print "Skipping $dist as it isn't in the 'only' list...\n" if $self->verbose;
+        }
+        elsif ( !$self->ignore_versions && defined $self->{_perl_version} && ( $self->{_perl_version} ne $] ) ) {
+            print "Skipping $dist as it's build Perl version ($self->{_perl_version}) differs from the currently running perl ($])...\n" if $self->verbose;
         }
         else {
             my $report = $self->make_report($resource, $dist, $result, @test_output);

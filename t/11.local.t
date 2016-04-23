@@ -20,6 +20,7 @@ ok my $reporter = App::cpanminus::reporter->new(
     build_logfile  => $dir . 'build.single.log',
     quiet          => 1,
     'skip-history' => 1,
+    'ignore-versions' => 1,
 ), 'created new reporter object';
 
 is $reporter->quiet, 1, 'reporter is quiet';

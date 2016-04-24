@@ -259,11 +259,15 @@ sub run {
       elsif ( /^Entering (\S+)/ ) {
         my $dep = $1;
         $found = 1;
-        Carp::croak 'Parsing error. This should not happen. Please send us a report!' if $recording && $recording eq 'test';
-        print "entering $dep, " . ($fetched || '(local)') . "\n" if $self->verbose;
-        $parser->($dep, $fetched);
-        print "left $dep, " . ($fetched || '(local)') . "\n" if $self->verbose;
-        next;
+        if ($recording && $recording eq 'test') {
+            Carp::croak 'Parsing error. This should not happen. Please send us a report!';
+        }
+        else {
+            print "entering $dep, " . ($fetched || '(local)') . "\n" if $self->verbose;
+            $parser->($dep, $fetched);
+            print "left $dep, " . ($fetched || '(local)') . "\n" if $self->verbose;
+            next;
+        }
       }
       elsif ( /^Running (?:Build|Makefile)\.PL/ ) {
         $recording = 'configure';

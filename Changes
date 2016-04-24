@@ -1,5 +1,9 @@
 Revision history for App-cpanminus-reporter
 
+0.15 2016-04-24
+    BUG FIXES:
+        - updated dependencies
+
 0.14 2016-04-23
     NEW FEATURES:
         - support for cpanm --installdeps .

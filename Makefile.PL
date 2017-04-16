@@ -14,6 +14,7 @@ WriteMakefile(
         : ()
     ),
     PREREQ_PM => {
+        'perl'                          => '5.008005'
         'CPAN::Meta::Converter'         => 0,
         'CPAN::Testers::Common::Client' => 0.11,
         'Capture::Tiny'                 => 0,

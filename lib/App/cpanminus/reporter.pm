@@ -451,7 +451,7 @@ sub make_report {
     $reporter->send() || die $reporter->errstr();
   }
   catch {
-    print "Error while sending this report, continuing with the next one...\n" unless $self->quiet;
+    print "Error while sending this report, continuing with the next one ($_)...\n" unless $self->quiet;
     print "DEBUG: @_" if $self->verbose;
   } finally{
     $client->record_history unless $self->skip_history;

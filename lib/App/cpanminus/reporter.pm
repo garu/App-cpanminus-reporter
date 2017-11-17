@@ -447,7 +447,7 @@ sub make_report {
   );
 
   if ($self->dry_run) {
-    print "not sending (drun run)\n" unless $self->quiet;
+    print "not sending (dry run)\n" unless $self->quiet;
     return;
   }
 

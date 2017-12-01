@@ -372,11 +372,8 @@ sub parse_uri {
 
   my $uri = URI->new( $resource );
   my $scheme = lc $uri->scheme;
-  if (    $scheme ne 'http'
-      and $scheme ne 'https'
-      and $scheme ne 'ftp'
-      and $scheme ne 'cpan'
-  ) {
+  my %eligible_schemes = map {$_ => 1} (qw| http https ftp cpan file |);
+  if (! $eligible_schemes{$scheme}) {
     print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
       unless $self->quiet;
     return;

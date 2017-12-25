@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 use App::cpanminus::reporter;
+use Cwd;
+use File::Spec;
+use Data::Dump ( qw| dd pp | );
 
 can_ok 'App::cpanminus::reporter',
 	qw( new config verbose quiet only exclude build_dir build_logfile
@@ -49,5 +52,29 @@ is_deeply $ret, $reporter->only, 'only() was properly returned when set';
 
 ok my $config = $reporter->config, 'object has config()';
 isa_ok $config, 'CPAN::Testers::Common::Client::Config';
+
+{
+    note("Testing 'file' scheme");
+
+    my $reporter = App::cpanminus::reporter->new();
+    ok(defined $reporter, "created a new reporter object");
+    isa_ok($reporter, 'App::cpanminus::reporter');
+
+    my ($uri, $rf);
+    my $cwd = cwd();
+    my $tarball_for_testing = File::Spec->catfile($cwd, 't', 'data', 'Phony-PASS-0.01.tar.gz');
+    ok(-f $tarball_for_testing, "Located tarball '$tarball_for_testing'");
+    $uri = qq|file://$tarball_for_testing|;
+    $rf = $reporter->parse_uri($uri);
+    ok($rf, "parse_uri() returned true value");
+    my %expect = (
+        distfile => $uri,
+        author => undef,
+    );
+    is($reporter->distfile(), $expect{distfile},
+        "distfile() returned expected value: $expect{distfile}");
+    ok(! defined $reporter->author(),
+        "author() returned undefined, as expected");
+}
 
 done_testing;

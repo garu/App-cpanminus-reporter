@@ -4,7 +4,6 @@ use Test::More;
 use App::cpanminus::reporter;
 use Cwd;
 use File::Spec;
-use Data::Dump ( qw| dd pp | );
 
 can_ok 'App::cpanminus::reporter',
 	qw( new config verbose quiet only exclude build_dir build_logfile

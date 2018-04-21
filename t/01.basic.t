@@ -61,7 +61,7 @@ isa_ok $config, 'CPAN::Testers::Common::Client::Config';
 
     my ($uri, $rf);
     my $cwd = cwd();
-    my $tarball_for_testing = File::Spec->catfile($cwd, 't', 'data', 'Phony-PASS-0.01.tar.gz');
+    my $tarball_for_testing = File::Spec->catfile($cwd, 't', 'data', 'Phony-PASS-0.01.tgz');
     ok(-f $tarball_for_testing, "Located tarball '$tarball_for_testing'");
     $uri = qq|file://$tarball_for_testing|;
     $rf = $reporter->parse_uri($uri);

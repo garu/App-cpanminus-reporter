@@ -79,6 +79,8 @@ then, just call cpanm-reporter:
 
    --skip-history         Do not read nor write to the history file
 
+   --ignore-versions      Do not check if build perl version differs from the runtime
+
 
 =head1 DESCRIPTION
 

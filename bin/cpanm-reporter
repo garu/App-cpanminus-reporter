@@ -74,7 +74,7 @@ then, just call cpanm-reporter:
    --only=A::B,C::D,...   Only send reports for these modules
 
    --exclude=A::B,...     Don't send reports for these modules
-   
+
    --dry-run              Prepare, but do not actually send reports
 
    --skip-history         Do not read nor write to the history file

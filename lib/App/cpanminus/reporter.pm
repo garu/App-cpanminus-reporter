@@ -467,7 +467,7 @@ sub get_meta_for {
   my ($self, $dist) = @_;
   my $distdir = File::Spec->catdir( $self->build_dir, 'latest-build', $dist );
 
-  foreach my $meta_file ( qw( META.json META.yml META.yaml ) ) {
+  foreach my $meta_file ( qw( MYMETA.json MYMETA.yml META.json META.yml ) ) {
     my $meta_path = File::Spec->catfile( $distdir, $meta_file );
     if (-e $meta_path) {
       my $meta = eval { Parse::CPAN::Meta->load_file( $meta_path ) };

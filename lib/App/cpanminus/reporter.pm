@@ -465,7 +465,7 @@ sub make_report {
 
 sub get_meta_for {
   my ($self, $dist) = @_;
-  my $distdir = File::Spec->catdir( $self->build_dir, $dist );
+  my $distdir = File::Spec->catdir( $self->build_dir, 'latest-build', $dist );
 
   foreach my $meta_file ( qw( META.json META.yml META.yaml ) ) {
     my $meta_path = File::Spec->catfile( $distdir, $meta_file );

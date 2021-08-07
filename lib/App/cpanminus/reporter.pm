@@ -7,7 +7,7 @@ our $VERSION = '0.17';
 
 use Carp ();
 use File::Spec     3.19;
-use File::HomeDir  0.58 ();
+use File::HomeDir::Tiny ();
 use Test::Reporter 1.54;
 use CPAN::Testers::Common::Client 0.13;
 use CPAN::Testers::Common::Client::Config;
@@ -42,7 +42,7 @@ sub new {
 
   $self->build_dir(
     $params{build_dir}
-      || File::Spec->catdir( File::HomeDir->my_home, '.cpanm' )
+      || File::Spec->catdir( File::HomeDir::Tiny::home(), '.cpanm' )
   );
 
   $self->build_logfile(

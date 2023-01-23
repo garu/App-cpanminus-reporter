@@ -1,5 +1,6 @@
 Revision history for App-cpanminus-reporter
 
+0.18  2023-01-23
     OTHER:
       - reduced prereq tree by switching from File::HomeDir to
         File::HomeDir::Tiny.

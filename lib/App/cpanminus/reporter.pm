@@ -432,18 +432,23 @@ sub parse_uri {
 
   my $uri = URI->new( $resource );
   my $scheme = lc $uri->scheme;
-  if (    $scheme ne 'http'
-      and $scheme ne 'https'
-      and $scheme ne 'ftp'
-      and $scheme ne 'cpan'
-  ) {
+  my %eligible_schemes = map {$_ => 1} (qw| http https ftp cpan file |);
+  if (! $eligible_schemes{$scheme}) {
     print "invalid scheme '$scheme' for resource '$resource'. Skipping...\n"
       unless $self->quiet;
     return;
   }
 
-  my $author = $self->get_author( $uri->path );
-  unless ($author) {
+  my $author;
+  if ($scheme eq 'file') {
+    # A local file may not be in the correct format for Metabase::Resource.
+    # Hence, we may not be able to parse it for the author.
+    $author = '';
+  }
+  else {
+    $author = $self->get_author( $uri->path );
+  }
+  unless (defined $author) {
     print "error fetching author for resource '$resource'. Skipping...\n"
       unless $self->quiet;
     return;

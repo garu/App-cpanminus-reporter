@@ -14,7 +14,6 @@ use CPAN::Testers::Common::Client::Config;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Converter;
 use Try::Tiny;
-use Path::Tiny;
 use URI;
 use Metabase::Resource;
 use Capture::Tiny qw(capture);
@@ -52,6 +51,7 @@ sub new {
   );
 
   $self->max_age($params{max_age} || 30);
+
   foreach my $option ( qw(quiet verbose force exclude only dry-run skip-history ignore-versions all) ) {
     my $method = $option;
     $method =~ s/\-/_/g;
@@ -202,10 +202,8 @@ sub _check_cpantesters_config_data {
 }
 
 # Returns 1 if log is fresh enough, 0 if it is too old.
-# Optional second param asks to shorten instructions (used
-# when multiple files are processed)
 sub _check_build_log {
-  my ($self, $build_logfile, $short_instructions) = @_;
+  my ($self, $build_logfile) = @_;
 
   my $max_age = $self->max_age;
 
@@ -215,10 +213,8 @@ sub _check_build_log {
   my $mtime = (stat $build_logfile)[9];
   my $age_in_minutes = int((time - $mtime) / 60);
   if ( !$self->force && $mtime && $age_in_minutes > $max_age ) {
-    if($short_instructions) {
-      print << "EOMESSAGE";
-Skipping $build_logfile, it is too old (modified $age_in_minutes minutes ago > $max_age).
-EOMESSAGE
+    if($self->all) {
+      print "Skipping $build_logfile, too old (modified $age_in_minutes minutes ago > $max_age)."
     } else {
       print <<"EOMESSAGE";
 $build_logfile is too old (created $age_in_minutes minutes ago).
@@ -240,43 +236,48 @@ EOMESSAGE
   return 1;
 }
 
-sub _all_logfiles {
-  my $self = shift;
-  my $build_dir = path($self->build_dir);
-  my $work_dir = $build_dir->child("work");
-  unless($work_dir->exists) {
-    print <<"ENDOFM";
+sub _get_logfiles {
+  my ($self) = @_;
+  my @files;
+  if ($self->all) {
+    my $workdir = File::Spec->catdir($self->build_dir, 'work');
+    if (-e $workdir) {
+      opendir my $dh, $workdir or return ();
+      my @children = grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+      closedir $dh;
+      foreach my $child (@children) {
+        my $logfile = File::Spec->catfile($workdir, $child, 'build.log');
+        if (-e $logfile && !-d _) {
+          push @files, $logfile;
+        }
+      }
+    }
+    else {
+      print <<"EOMSG";
 Can not find cpanm work directory (tried $work_dir).
 Please specify top cpanm dir as --build-dir, or do not
 specify --build-dir if it is in ~/.cpanm.
-ENDOFM
-    return;
+EOMSG
+    }
   }
-  return grep { $_->is_file }
-         map { $_->child("build.log") }
-         grep { $_->is_dir }
-         $work_dir->children;
+  else {
+    push @files, $self->build_logfile;
+  }
+  return @files;
 }
-
 
 sub run {
   my $self = shift;
   return unless $self->_check_cpantesters_config_data;
-  unless($self->all) {
-    # Default mode, processing last logfile
-    $self->process_logfile($self->build_logfile);
-  } else {
-    # all mode, looking for any possible file
-    foreach my $logfile ($self->_all_logfiles) {
-      $self->process_logfile($logfile, 1); # Short instructions in this case
-    }
+  foreach my $logfile ($self->_get_logfiles) {
+    $self->process_logfile($logfile);
   }
 }
 
 sub process_logfile {
-  my ($self, $logfile, $skip_instructions) = @_;
+  my ($self, $logfile) = @_;
 
-  return unless $self->_check_build_log($logfile, $skip_instructions);
+  return unless $self->_check_build_log($logfile);
 
   open my $fh, '<', $logfile
     or Carp::croak "error opening build log file '$logfile' for reading: $!";

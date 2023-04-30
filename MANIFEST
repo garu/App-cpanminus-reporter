@@ -41,7 +41,7 @@ t/data/build.single_extended.log
 t/data/build.verbose_cpanm.log
 t/data/build.version_mismatch.log
 t/data/build.version_strings.log
-t/data/Phony-PASS-0.01.tgz
+t/data/pause_mocker/M/ME/METATEST/Phony-PASS-0.01.tgz
 xt/perlcritic.t
 xt/pod-coverage.t
 xt/pod.t

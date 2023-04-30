@@ -8,3 +8,4 @@
 ^App-cpanmninus-reporter
 ^MANIFEST.bak
 ^pm_to_blib
+^.vscode/*

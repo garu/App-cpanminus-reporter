@@ -272,6 +272,7 @@ sub run {
   foreach my $logfile ($self->_get_logfiles) {
     $self->process_logfile($logfile);
   }
+  return;
 }
 
 sub process_logfile {

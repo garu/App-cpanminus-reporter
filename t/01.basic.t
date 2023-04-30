@@ -61,19 +61,28 @@ isa_ok $config, 'CPAN::Testers::Common::Client::Config';
 
     my ($uri, $rf);
     my $cwd = cwd();
-    my $tarball_for_testing = File::Spec->catfile($cwd, 't', 'data', 'Phony-PASS-0.01.tgz');
+    my $tarball_for_testing = File::Spec->catfile(
+      $cwd,
+      't',
+      'data',
+      'pause_mocker',
+      'M',
+      'ME',
+      'METATEST',
+      'Phony-PASS-0.01.tgz'
+    );
     ok(-f $tarball_for_testing, "Located tarball '$tarball_for_testing'");
     $uri = qq|file://$tarball_for_testing|;
     $rf = $reporter->parse_uri($uri);
     ok($rf, "parse_uri() returned true value");
     my %expect = (
-        distfile => $uri,
-        author => undef,
+        distfile => 'METATEST/Phony-PASS-0.01.tgz',
+        author => 'METATEST',
     );
     is($reporter->distfile(), $expect{distfile},
         "distfile() returned expected value: $expect{distfile}");
-    ok(! defined $reporter->author(),
-        "author() returned undefined, as expected");
+    is($reporter->author(), $expect{author},
+        "author() returned the proper author");
 }
 
 done_testing;

@@ -254,7 +254,7 @@ sub _get_logfiles {
     }
     else {
       print <<"EOMSG";
-Can not find cpanm work directory (tried $work_dir).
+Can not find cpanm work directory (tried $workdir).
 Please specify top cpanm dir as --build-dir, or do not
 specify --build-dir if it is in ~/.cpanm.
 EOMSG
@@ -411,7 +411,37 @@ sub process_logfile {
 }
 
 sub get_author {
-  my ($self, $path ) = @_;
+  my ($self, $path) = @_;
+  if ($path->scheme eq 'file') {
+    return $self->_get_author_from_file($path);
+  }
+  else {
+    return $self->_get_author_from_metabase($path->path);
+  }
+}
+
+sub _get_author_from_file {
+  my ($self, $path) = @_;
+
+  my $directories = (File::Spec->splitpath($path))[1];
+  my @path = File::Spec->splitdir($directories);
+  pop @path if $path[-1] eq '';
+
+  if ( @path >= 3                               # R/RJ/RJBS
+       && $path[-1] =~ /\A[A-Z\-]+\z/           # RJBS
+       && substr($path[-1], 0, 2) eq $path[-2]  # RJ
+       && substr($path[-1], 0, 1) eq $path[-3]  # R
+  ) {
+    return $path[-1];
+  }
+  else {
+    print "DEBUG: path '$path' doesn't look valid" if $self->verbose;
+    return;
+  }
+}
+
+sub _get_author_from_metabase {
+  my ($self, $path) = @_;
   my $metadata;
 
   try {
@@ -439,15 +469,8 @@ sub parse_uri {
     return;
   }
 
-  my $author;
-  if ($scheme eq 'file') {
-    # A local file may not be in the correct format for Metabase::Resource.
-    # Hence, we may not be able to parse it for the author.
-    $author = '';
-  }
-  else {
-    $author = $self->get_author( $uri->path );
-  }
+  my $author = $self->get_author( $uri );
+
   unless (defined $author) {
     print "error fetching author for resource '$resource'. Skipping...\n"
       unless $self->quiet;

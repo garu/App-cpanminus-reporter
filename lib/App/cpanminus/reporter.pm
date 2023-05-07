@@ -354,6 +354,10 @@ sub process_logfile {
           if ($result eq 'FAIL' && $recording eq 'configure') {
             $result = 'NA';
           }
+          elsif ($result eq 'FAIL' && @test_output > 1 && $test_output[-2] =~ /make.*?[1-9]/) {
+            # [dn]make error returning non-zero status should be graded UNKNOWN
+            $result = 'UNKNOWN';
+          }
           elsif ($result eq 'OK') {
             $result = $has_tests ? 'PASS' : 'UNKNOWN';
           }
